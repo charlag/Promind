@@ -24,10 +24,7 @@ class ModelImpl : Model {
 
         val morningTime = TimeInterval(sixAm, noon, false)
         val headspaceAction = Action.OpenMainAction("com.getsomeheadspace.android")
-        val headspaceCondition = Condition(null, morningTime, object : UserHint {
-            override val title = "Headspace"
-            override val action = headspaceAction
-        })
+        val headspaceCondition = Condition(null, morningTime, UserHint("Headspace", headspaceAction))
 
         val fourPm = Calendar.getInstance().run {
             set(0, 0, 0, 16, 0)
@@ -35,10 +32,8 @@ class ModelImpl : Model {
         }
 
         val mealsAction = Action.UriAction("geo:0,0?q=restaurants")
-        val mealsCondition = Condition(null, TimeInterval(noon, fourPm, false), object : UserHint {
-            override val title = "Meals"
-            override val action: Action = mealsAction
-        })
+        val mealsCondition = Condition(null, TimeInterval(noon, fourPm, false),
+                UserHint("Meals", mealsAction))
 
         val conditions = listOf(headspaceCondition, mealsCondition)
 

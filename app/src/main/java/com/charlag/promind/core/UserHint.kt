@@ -2,9 +2,8 @@ package com.charlag.promind.core
 
 /**
  * Created by charlag on 11/02/2017.
+ *
+ * Value which is used to present user hints.
  */
 
-interface UserHint {
-    val title: String
-    val action: Action
-}
+data class UserHint(val title: String, val action: Action)
