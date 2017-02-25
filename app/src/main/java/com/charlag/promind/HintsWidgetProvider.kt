@@ -6,6 +6,7 @@ import android.appwidget.AppWidgetProvider
 import android.content.Context
 import android.widget.RemoteViews
 import com.charlag.promind.core.AssistantContext
+import com.charlag.promind.core.ConditionDbRepository
 import com.charlag.promind.core.ModelImpl
 import java.util.*
 
@@ -20,7 +21,7 @@ class HintsWidgetProvider : AppWidgetProvider() {
         appWidgetIds.forEach { id ->
             val views = RemoteViews(context.packageName, R.layout.hints_widget_layout)
 
-            val model = ModelImpl()
+            val model = ModelImpl(ConditionDbRepository())
             val assistantContext = AssistantContext(null, Date())
             model.getHintsForContext(assistantContext).map { hint ->
                 val button = RemoteViews(context.packageName, R.layout.hint_widget)

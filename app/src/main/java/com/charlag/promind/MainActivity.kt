@@ -9,8 +9,10 @@ import android.support.v4.app.ActivityCompat
 import android.support.v7.app.AppCompatActivity
 import android.widget.TextView
 import com.charlag.promind.core.AssistantContext
+import com.charlag.promind.core.ConditionDbRepository
+import com.charlag.promind.core.Location
 import com.charlag.promind.core.ModelImpl
-import java.util.Date
+import java.util.*
 
 class MainActivity : AppCompatActivity() {
 
@@ -52,8 +54,8 @@ class MainActivity : AppCompatActivity() {
         val locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
 
         val lastLocation = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER)
-        val assistContext = AssistantContext(lastLocation, Date())
-        val model = ModelImpl()
+        val assistContext = AssistantContext(Location(lastLocation.latitude, lastLocation.longitude), Date())
+        val model = ModelImpl(ConditionDbRepository())
         val hints = model.getHintsForContext(assistContext)
         hintsTextView.text = hints.map { it.title }.joinToString(separator = "\n")
         hintsTextView.setOnClickListener {

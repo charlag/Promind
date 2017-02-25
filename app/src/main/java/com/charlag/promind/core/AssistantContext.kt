@@ -1,8 +1,7 @@
 package com.charlag.promind.core
 
-import android.location.Location
 
-import java.util.Date
+import java.util.*
 
 /**
  * Created by charlag on 11/02/2017.

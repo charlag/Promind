@@ -10,74 +10,47 @@ import java.util.*
  */
 
 // TODO: make package scoped
-class ModelImpl : Model {
+class ModelImpl(private val repository: ConditionRepository) : Model {
 
     override fun getHintsForContext(context: AssistantContext): List<UserHint> {
-        val sixAm = Calendar.getInstance().run {
-            set(0, 0, 0, 6, 0)
-            time
-        }
-        val noon = Calendar.getInstance().run {
-            set(0, 0, 0, 12, 0)
-            time
-        }
-
-        val morningTime = TimeInterval(sixAm, noon, false)
-        val headspaceAction = Action.OpenMainAction("com.getsomeheadspace.android")
-        val headspaceCondition = Condition(null, morningTime, UserHint("Headspace", headspaceAction))
-
-        val fourPm = Calendar.getInstance().run {
-            set(0, 0, 0, 16, 0)
-            time
-        }
-
-        val mealsAction = Action.UriAction("geo:0,0?q=restaurants")
-        val mealsCondition = Condition(null, TimeInterval(noon, fourPm, false),
-                UserHint("Meals", mealsAction))
-
-        val conditions = listOf(headspaceCondition, mealsCondition)
-
-        return conditions.filter { condition ->
-            condition.location?.equals(context.location) ?: true &&
-                    condition.timeInterval?.inInterval(context.date, Calendar.getInstance()) ?: true
-        }
+        return repository.getConditions()
+                .filter { condition ->
+                    filterByLocation(condition, context) &&
+                            filterByTime(condition, context) &&
+                            filterByDate(condition, context)
+                }
                 .map(Condition::hint)
-//        val calendar = Calendar.getInstance()
-//        calendar.time = context.date
-//        val hour = calendar.get(Calendar.HOUR_OF_DAY)
-//
-//        if (hour < 12) {
-//            val intent = appContext.packageManager.getLaunchIntentForPackage("com.getsomeheadspace.android")
-//            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-//            hints.add(object : UserHint {
-//                override val title = "Headspace"
-//                override val action = intent
-//            })
-//        }
-//
-//        if (hour > 22) {
-//            hints.add(object : UserHint {
-//                override val title = "Calendar"
-//                override val action = null
-//            })
-//        }
-//
-//        if (isMealHour(hour)) {
-//            val intentUri = Uri.parse("geo:0,0?q=restaurants")
-//            val mapIntent = Intent(Intent.ACTION_VIEW, intentUri)
-//            hints.add(object : UserHint {
-//                override val title = "Meals"
-//                override val action = mapIntent
-//            })
-//        }
-//
-//        if (homeLocation != null && homeLocation.distanceTo(context.location) > 10 * 1000) {
-//            hints.add(object : UserHint {
-//                override val title = "Get home directions"
-//                override val action = null
-//            })
-//        }
-//
-//        return hints
+                .toList()
+    }
+
+    private fun filterByLocation(condition: Condition, context: AssistantContext): Boolean {
+        val distanceCriteria = 1000.0
+        if (condition.location == null) return true
+        if (context.location == null) return false
+        val distance = condition.location.distanceTo(context.location)
+        return if (condition.locationInverted) distance > distanceCriteria
+        else distance < distanceCriteria
+    }
+
+    private fun filterByTime(condition: Condition, context: AssistantContext): Boolean {
+        if (condition.timeFrom == null || condition.timeTo == null) return true
+        val time = Calendar.getInstance().run {
+            time = context.date
+            get(Calendar.HOUR_OF_DAY) * 60 + get(Calendar.MINUTE)
+        }
+        return condition.timeFrom <= time && time <= condition.timeTo
+    }
+
+    private fun filterByDate(condition: Condition, context: AssistantContext): Boolean {
+        if (condition.date == null) return true
+        val today = Calendar.getInstance().run {
+            time = context.date
+            get(Calendar.DATE)
+        }
+        val conditionDate = Calendar.getInstance().run {
+            time = condition.date
+            get(Calendar.DATE)
+        }
+        return today == conditionDate
     }
 }

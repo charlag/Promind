@@ -1,6 +1,6 @@
 package com.charlag.promind.core
 
-import android.location.Location
+import java.sql.Date
 
 /**
  * Created by charlag on 25/02/2017.
@@ -8,4 +8,5 @@ import android.location.Location
  * Data class used by database and model to match location and time to the actions
  */
 
-data class Condition(val location: Location?, val timeInterval: TimeInterval?, val hint: UserHint)
+data class Condition(val location: Location?, val timeFrom: Int?, val timeTo: Int?,
+                     val date: Date?, val hint: UserHint, val locationInverted: Boolean = false)
