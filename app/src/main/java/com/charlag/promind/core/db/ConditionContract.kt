@@ -7,7 +7,7 @@ import android.provider.BaseColumns
  */
 
 class ConditionContract {
-    companion object ConditionEntry : BaseColumns {
+    object ConditionEntry : BaseColumns {
         val id = BaseColumns._ID
         val count = BaseColumns._COUNT
         val tableName = "condition"
@@ -17,5 +17,7 @@ class ConditionContract {
         val timeFrom = "timeFrom"
         val timeTo = "timeTo"
         val date = "date"
+        val priority = "priority"
+        val hint = "hint"
     }
 }

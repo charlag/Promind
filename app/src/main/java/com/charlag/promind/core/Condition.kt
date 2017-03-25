@@ -1,6 +1,6 @@
 package com.charlag.promind.core
 
-import java.sql.Date
+import java.util.Date
 
 /**
  * Created by charlag on 25/02/2017.

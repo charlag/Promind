@@ -12,6 +12,9 @@ import com.charlag.promind.core.AssistantContext
 import com.charlag.promind.core.ConditionDbRepository
 import com.charlag.promind.core.Location
 import com.charlag.promind.core.ModelImpl
+import com.charlag.promind.core.db.ConditionDbHelper
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 import java.util.*
 
 class MainActivity : AppCompatActivity() {
@@ -55,14 +58,22 @@ class MainActivity : AppCompatActivity() {
 
         val lastLocation = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER)
         val assistContext = AssistantContext(Location(lastLocation.latitude, lastLocation.longitude), Date())
-        val model = ModelImpl(ConditionDbRepository())
-        val hints = model.getHintsForContext(assistContext)
-        hintsTextView.text = hints.map { it.title }.joinToString(separator = "\n")
-        hintsTextView.setOnClickListener {
-            hints.firstOrNull()?.let { hint ->
-                val intent = hint.action.makeIntent(this)
-                startActivity(intent)
-            }
-        }
+        val repository = ConditionDbRepository(ConditionDbHelper(this))
+        val model = ModelImpl(repository)
+
+        model.getHintsForContext(assistContext)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe { hints ->
+                    hints.forEach {
+                        hintsTextView.text = hints.map { it.title }.joinToString(separator = "\n")
+                        hintsTextView.setOnClickListener {
+                            hints.firstOrNull()?.let { hint ->
+                                val intent = hint.action.makeIntent(this)
+                                startActivity(intent)
+                            }
+                        }
+                    }
+                }
     }
 }

@@ -1,6 +1,7 @@
 package com.charlag.promind
 
 import com.charlag.promind.core.*
+import io.reactivex.Observable
 import org.junit.Test
 import java.util.*
 import kotlin.test.assertNotNull
@@ -12,7 +13,8 @@ import kotlin.test.assertNotNull
 class ModelImplTest {
 
     class TestRepository(val conditions: List<Condition>) : ConditionRepository {
-        override fun getConditions(): Sequence<Condition> = conditions.asSequence()
+        override fun getConditions(time: Int, date: Date): Observable<List<Condition>> =
+                Observable.just(conditions)
 
         override fun addCondition() {}
 
@@ -35,7 +37,7 @@ class ModelImplTest {
         }
         val context = AssistantContext(null, time)
         // when
-        val hints = obj.getHintsForContext(context)
+        val hints = obj.getHintsForContext(context).blockingFirst()
         // then
         assert(hints.isNotEmpty())
         assert(hints.first().title == expectedHint.title)

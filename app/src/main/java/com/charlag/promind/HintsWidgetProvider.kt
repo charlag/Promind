@@ -8,6 +8,7 @@ import android.widget.RemoteViews
 import com.charlag.promind.core.AssistantContext
 import com.charlag.promind.core.ConditionDbRepository
 import com.charlag.promind.core.ModelImpl
+import com.charlag.promind.core.db.ConditionDbHelper
 import java.util.*
 
 /**
@@ -21,18 +22,20 @@ class HintsWidgetProvider : AppWidgetProvider() {
         appWidgetIds.forEach { id ->
             val views = RemoteViews(context.packageName, R.layout.hints_widget_layout)
 
-            val model = ModelImpl(ConditionDbRepository())
+            val repository = ConditionDbRepository(ConditionDbHelper(context))
+            val model = ModelImpl(repository)
             val assistantContext = AssistantContext(null, Date())
-            model.getHintsForContext(assistantContext).map { hint ->
-                val button = RemoteViews(context.packageName, R.layout.hint_widget)
-                button.setTextViewText(R.id.widget_hint_text, hint.title)
-                val intent = hint.action.makeIntent(context)
-                val pendingIntent = PendingIntent.getActivity(context, 0, intent, 0)
-                button.setOnClickPendingIntent(R.id.widget_hint_text, pendingIntent)
-                button
+            model.getHintsForContext(assistantContext).subscribe { hints ->
+                hints.map { (title, action) ->
+                    val button = RemoteViews(context.packageName, R.layout.hint_widget)
+                    button.setTextViewText(R.id.widget_hint_text, title)
+                    val intent = action.makeIntent(context)
+                    val pendingIntent = PendingIntent.getActivity(context, 0, intent, 0)
+                    button.setOnClickPendingIntent(R.id.widget_hint_text, pendingIntent)
+                    button
+                }
+                        .forEach { views.addView(R.id.containter_hints_widget, it) }
             }
-                    .forEach { views.addView(R.id.containter_hints_widget, it) }
-
             appWidgetManager.updateAppWidget(id, views)
         }
     }
