@@ -6,9 +6,9 @@ import android.appwidget.AppWidgetProvider
 import android.content.Context
 import android.widget.RemoteViews
 import com.charlag.promind.core.AssistantContext
-import com.charlag.promind.core.ConditionDbRepository
+import com.charlag.promind.core.data.source.ConditionDbRepository
 import com.charlag.promind.core.ModelImpl
-import com.charlag.promind.core.db.ConditionDbHelper
+import com.charlag.promind.core.data.source.db.ConditionDbHelper
 import java.util.*
 
 /**

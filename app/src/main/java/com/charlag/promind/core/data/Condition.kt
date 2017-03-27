@@ -1,5 +1,7 @@
-package com.charlag.promind.core
+package com.charlag.promind.core.data
 
+import com.charlag.promind.core.data.Location
+import com.charlag.promind.core.UserHint
 import java.util.Date
 
 /**

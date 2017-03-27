@@ -1,4 +1,4 @@
-package com.charlag.promind.core.db
+package com.charlag.promind.core.data.source.db
 
 import android.provider.BaseColumns
 

@@ -1,4 +1,4 @@
-package com.charlag.promind.core
+package com.charlag.promind.core.data
 
 /**
  * Created by charlag on 11/02/2017.
@@ -13,9 +13,9 @@ sealed class Action {
 
 
     override fun equals(other: Any?): Boolean =
-            (this is Action.OpenMainAction && other is Action.OpenMainAction &&
+            (this is OpenMainAction && other is OpenMainAction &&
                     this.packageName == other.packageName) ||
-                    (this is Action.UriAction && other is Action.UriAction &&
+                    (this is UriAction && other is UriAction &&
                             this.uri == other.uri)
 
     override fun hashCode(): Int =

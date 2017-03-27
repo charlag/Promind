@@ -3,7 +3,7 @@ package com.charlag.promind
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import com.charlag.promind.core.Action
+import com.charlag.promind.core.data.Action
 
 /**
  * Created by charlag on 25/02/2017.

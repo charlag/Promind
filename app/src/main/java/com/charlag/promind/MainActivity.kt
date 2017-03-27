@@ -8,19 +8,21 @@ import android.os.Bundle
 import android.support.v4.app.ActivityCompat
 import android.support.v7.app.AppCompatActivity
 import android.widget.TextView
-import com.charlag.promind.core.AssistantContext
-import com.charlag.promind.core.ConditionDbRepository
-import com.charlag.promind.core.Location
-import com.charlag.promind.core.ModelImpl
-import com.charlag.promind.core.db.ConditionDbHelper
+import com.charlag.promind.core.*
+import com.charlag.promind.core.data.Location
+import com.charlag.promind.core.data.source.db.ConditionDbHelper
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import java.util.*
+import javax.inject.Inject
 
 class MainActivity : AppCompatActivity() {
 
+    @Inject lateinit var model: Model
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        App.graph.inject(this)
         setContentView(R.layout.activity_main)
 
         if (ActivityCompat.checkSelfPermission(this,
@@ -58,15 +60,19 @@ class MainActivity : AppCompatActivity() {
 
         val lastLocation = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER)
         val assistContext = AssistantContext(Location(lastLocation.latitude, lastLocation.longitude), Date())
-        val repository = ConditionDbRepository(ConditionDbHelper(this))
-        val model = ModelImpl(repository)
 
         model.getHintsForContext(assistContext)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe { hints ->
+                    hintsTextView.text = hints.map { it.title }.joinToString(separator = "\n")
+                            .let { result ->
+                                if (result.isEmpty())
+                                    getString(R.string.title_no_hints)
+                                else
+                                    result
+                            }
                     hints.forEach {
-                        hintsTextView.text = hints.map { it.title }.joinToString(separator = "\n")
                         hintsTextView.setOnClickListener {
                             hints.firstOrNull()?.let { hint ->
                                 val intent = hint.action.makeIntent(this)

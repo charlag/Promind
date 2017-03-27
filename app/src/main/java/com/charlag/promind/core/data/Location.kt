@@ -1,4 +1,4 @@
-package com.charlag.promind.core
+package com.charlag.promind.core.data
 
 /**
  * Created by charlag on 25/02/2017.

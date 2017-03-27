@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Promind</string>
+    <string name="title_no_hints">No hints for now. Check later!</string>
 </resources>

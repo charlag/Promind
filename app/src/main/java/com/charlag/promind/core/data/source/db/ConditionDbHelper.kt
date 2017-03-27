@@ -1,11 +1,11 @@
-package com.charlag.promind.core.db
+package com.charlag.promind.core.data.source.db
 
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 
-import com.charlag.promind.core.db.ConditionContract.ConditionEntry
-import com.charlag.promind.core.db.HintContract.HintEntry
+import com.charlag.promind.core.data.source.db.ConditionContract.ConditionEntry
+import com.charlag.promind.core.data.source.db.HintContract.HintEntry
 
 /**
  * Created by charlag on 25/02/2017.
@@ -41,6 +41,6 @@ class ConditionDbHelper(context: Context) : SQLiteOpenHelper(context, dbName, nu
     }
 
     override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
-        throw UnsupportedOperationException("not implemented") //To change body of created functions use File | Settings | File Templates.
+        throw UnsupportedOperationException("not implemented")
     }
 }

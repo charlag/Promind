@@ -1,5 +1,6 @@
-package com.charlag.promind.core
+package com.charlag.promind.core.data.source
 
+import com.charlag.promind.core.data.Condition
 import io.reactivex.Observable
 import java.util.Date
 
