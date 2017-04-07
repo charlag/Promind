@@ -1,5 +1,7 @@
 package com.charlag.promind.core.data
 
+import com.charlag.promind.core.data.source.db.HintContract
+
 /**
  * Created by charlag on 11/02/2017.
  *
@@ -11,6 +13,17 @@ sealed class Action {
     class OpenMainAction(val packageName: String) : Action()
     class UriAction(val uri: String) : Action()
 
+    val type: String
+        get() = when (this) {
+            is Action.OpenMainAction -> HintContract.HintActionType.openMain
+            is Action.UriAction -> HintContract.HintActionType.url
+        }
+
+    val data: String
+        get() = when (this) {
+            is OpenMainAction -> packageName
+            is UriAction -> uri
+        }
 
     override fun equals(other: Any?): Boolean =
             (this is OpenMainAction && other is OpenMainAction &&
@@ -19,8 +32,8 @@ sealed class Action {
                             this.uri == other.uri)
 
     override fun hashCode(): Int =
-            if (this is OpenMainAction) ("OpenMainAction" + packageName).hashCode()
-            else if (this is UriAction) ("UriAction" + uri).hashCode()
-            else 0
-
+            when (this) {
+                is Action.OpenMainAction -> ("OpenMainAction" + packageName).hashCode()
+                is Action.UriAction -> ("UriAction" + uri).hashCode()
+            }
 }

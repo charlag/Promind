@@ -1,15 +1,14 @@
 package com.charlag.promind.core.data.source
 
+import android.content.ContentValues
 import com.charlag.promind.core.UserHint
 import com.charlag.promind.core.asSequence
-import com.charlag.promind.core.data.source.ConditionRepository
-import com.charlag.promind.core.data.source.db.ConditionContract
 import com.charlag.promind.core.data.Action
 import com.charlag.promind.core.data.Condition
 import com.charlag.promind.core.data.Location
+import com.charlag.promind.core.data.source.db.ConditionContract.ConditionEntry
 import com.charlag.promind.core.data.source.db.ConditionDbHelper
 import com.charlag.promind.core.data.source.db.HintContract
-import com.charlag.promind.core.data.source.db.ConditionContract.ConditionEntry
 import io.reactivex.Observable
 import java.sql.SQLException
 import java.util.*
@@ -34,6 +33,7 @@ class ConditionDbRepository(private val dbHelper: ConditionDbHelper) : Condition
             val cursor = db.query(ConditionEntry.tableName, null, selection, null, null, null, null)
             val result = cursor.asSequence()
                     .map { map ->
+                        val hintId = map[HintContract.HintEntry.id] as Long
                         val hintTitle = map[HintContract.HintEntry.title] as String
                         val hintType = map[HintContract.HintEntry.type] as String
                         val hintData = map[HintContract.HintEntry.data] as String?
@@ -50,7 +50,7 @@ class ConditionDbRepository(private val dbHelper: ConditionDbHelper) : Condition
                         val timeTo = map[ConditionEntry.timeTo] as Int?
                         val rawDate = map[ConditionEntry.date] as Long?
 
-                        val hint = UserHint(hintTitle, action)
+                        val hint = UserHint(hintId, hintTitle, action)
                         val location = if (latitude != null && longitude != null)
                             Location(latitude, longitude)
                         else null
@@ -65,7 +65,30 @@ class ConditionDbRepository(private val dbHelper: ConditionDbHelper) : Condition
         }
     }
 
-    override fun addCondition() {
+    override fun addCondition(condition: Condition) {
+        val db = dbHelper.writableDatabase
+
+        val hintValues = ContentValues()
+        if (condition.hint.id >= 0) {
+            hintValues.put(HintContract.HintEntry.id, condition.hint.id)
+        }
+        hintValues.put(HintContract.HintEntry.title, condition.hint.title)
+        hintValues.put(HintContract.HintEntry.type, condition.hint.action.type)
+        hintValues.put(HintContract.HintEntry.data, condition.hint.action.data)
+
+        val hintId = db.insert(HintContract.HintEntry.tableName, null, hintValues)
+
+        val values = ContentValues()
+        values.put(ConditionEntry.latitude, condition.location?.latitude)
+        values.put(ConditionEntry.longitude, condition.location?.longitude)
+        values.put(ConditionEntry.timeFrom, condition.timeFrom)
+        values.put(ConditionEntry.timeTo, condition.timeTo)
+        values.put(ConditionEntry.date, condition.date?.time)
+        values.put(ConditionEntry.hint, hintId)
+
+        db.insert(ConditionEntry.tableName, null, values)
+
+        db.close()
     }
 
     override fun removeCondition(id: Int) {

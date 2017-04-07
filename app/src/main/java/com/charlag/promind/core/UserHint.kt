@@ -8,4 +8,4 @@ import com.charlag.promind.core.data.Action
  * Value which is used to present user hints.
  */
 
-data class UserHint(val title: String, val action: Action)
+data class UserHint(val id: Long, val title: String, val action: Action)

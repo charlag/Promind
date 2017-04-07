@@ -6,8 +6,8 @@ import android.appwidget.AppWidgetProvider
 import android.content.Context
 import android.widget.RemoteViews
 import com.charlag.promind.core.AssistantContext
-import com.charlag.promind.core.data.source.ConditionDbRepository
 import com.charlag.promind.core.ModelImpl
+import com.charlag.promind.core.data.source.ConditionDbRepository
 import com.charlag.promind.core.data.source.db.ConditionDbHelper
 import java.util.*
 
@@ -26,7 +26,7 @@ class HintsWidgetProvider : AppWidgetProvider() {
             val model = ModelImpl(repository)
             val assistantContext = AssistantContext(null, Date())
             model.getHintsForContext(assistantContext).subscribe { hints ->
-                hints.map { (title, action) ->
+                hints.map { (_, title, action) ->
                     val button = RemoteViews(context.packageName, R.layout.hint_widget)
                     button.setTextViewText(R.id.widget_hint_text, title)
                     val intent = action.makeIntent(context)
