@@ -1,28 +1,22 @@
 package com.charlag.promind
 
 import android.Manifest.permission.ACCESS_COARSE_LOCATION
-import android.content.Context
 import android.content.pm.PackageManager
-import android.location.LocationManager
 import android.os.Bundle
 import android.support.v4.app.ActivityCompat
 import android.support.v7.app.AppCompatActivity
 import android.widget.TextView
-import com.charlag.promind.core.*
-import com.charlag.promind.core.data.Location
-import com.charlag.promind.core.data.source.db.ConditionDbHelper
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.schedulers.Schedulers
-import java.util.*
+import com.charlag.promind.hints_screen.DaggerHintsComponent
+import com.charlag.promind.hints_screen.HintsScreenModule
+import com.charlag.promind.hints_screen.HintsScreenViewModel
 import javax.inject.Inject
 
 class MainActivity : AppCompatActivity() {
 
-    @Inject lateinit var model: Model
+    @Inject lateinit var viewModel: HintsScreenViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        App.graph.inject(this)
         setContentView(R.layout.activity_main)
 
         if (ActivityCompat.checkSelfPermission(this,
@@ -56,30 +50,18 @@ class MainActivity : AppCompatActivity() {
 
         val hintsTextView = findViewById(R.id.tv_hints) as TextView
 
-        val locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        DaggerHintsComponent.builder()
+                .appComponent(App.graph)
+                .hintsScreenModule(HintsScreenModule())
+                .build()
+                .inject(this)
 
-        val lastLocation = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER)
-        val assistContext = AssistantContext(Location(lastLocation.latitude, lastLocation.longitude), Date())
-
-        model.getHintsForContext(assistContext)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe { hints ->
-                    hintsTextView.text = hints.map { it.title }.joinToString(separator = "\n")
-                            .let { result ->
-                                if (result.isEmpty())
-                                    getString(R.string.title_no_hints)
-                                else
-                                    result
-                            }
-                    hints.forEach {
-                        hintsTextView.setOnClickListener {
-                            hints.firstOrNull()?.let { hint ->
-                                val intent = hint.action.makeIntent(this)
-                                startActivity(intent)
-                            }
-                        }
-                    }
-                }
+        viewModel.hints.subscribe { hints ->
+            hintsTextView.text = hints.foldRight(StringBuilder()) { (title), sb ->
+                sb.append(title)
+                sb.append('\n')
+            }
+                    .toString()
+        }
     }
 }

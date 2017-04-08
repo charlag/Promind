@@ -1,8 +1,11 @@
 package com.charlag.promind
 
-import android.app.Application
+import com.charlag.promind.core.Model
 import com.charlag.promind.core.ModelModule
+import com.charlag.promind.core.context_data.ContextDataModule
+import com.charlag.promind.core.context_data.DateProvider
 import com.charlag.promind.core.data.source.ConditionRepositoryModule
+import com.charlag.promind.hints_screen.HintsScreenModule
 import dagger.Component
 import javax.inject.Singleton
 
@@ -11,9 +14,10 @@ import javax.inject.Singleton
  */
 
 @Singleton
-@Component(modules = arrayOf(AppModule::class, ModelModule::class, ConditionRepositoryModule::class))
+@Component(modules = arrayOf(AppModule::class, ModelModule::class, ConditionRepositoryModule::class,
+        HintsScreenModule::class, ContextDataModule::class))
 interface AppComponent {
-    fun inject(application: Application)
-
-    fun inject(mainActivity: MainActivity)
+    fun model(): Model
+    fun dateProvider(): DateProvider
+    fun locationProvider(): LocationProvider
 }

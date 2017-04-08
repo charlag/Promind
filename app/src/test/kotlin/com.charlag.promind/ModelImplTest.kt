@@ -1,6 +1,8 @@
 package com.charlag.promind
 
-import com.charlag.promind.core.*
+import com.charlag.promind.core.AssistantContext
+import com.charlag.promind.core.ModelImpl
+import com.charlag.promind.core.UserHint
 import com.charlag.promind.core.data.Action
 import com.charlag.promind.core.data.Condition
 import com.charlag.promind.core.data.source.ConditionRepository
@@ -16,10 +18,12 @@ import kotlin.test.assertNotNull
 class ModelImplTest {
 
     class TestRepository(val conditions: List<Condition>) : ConditionRepository {
+        override fun addCondition(condition: Condition) {
+            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        }
+
         override fun getConditions(time: Int, date: Date): Observable<List<Condition>> =
                 Observable.just(conditions)
-
-        override fun addCondition() {}
 
         override fun removeCondition(id: Int) {}
     }
@@ -29,7 +33,7 @@ class ModelImplTest {
         // given
         val packageName = "com.getsomeheadspace.android"
         val expectedAction = Action.OpenMainAction(packageName)
-        val expectedHint = UserHint("Headspace", expectedAction)
+        val expectedHint = UserHint(1, "Headspace", expectedAction)
         val testCondition = Condition(null, 6 * 60, 11 * 60, null, expectedHint)
 
         val repo = TestRepository(listOf(testCondition))
