@@ -60,6 +60,7 @@ class ConditionDbRepository(private val dbHelper: ConditionDbHelper) : Condition
                     }
                     .toList()
             cursor.close()
+
             subscriber.onNext(result)
             subscriber.onComplete()
         }

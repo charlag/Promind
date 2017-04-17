@@ -20,23 +20,23 @@ class HintsWidgetProvider : AppWidgetProvider() {
         super.onUpdate(context, appWidgetManager, appWidgetIds)
 
         appWidgetIds.forEach { id ->
-            val views = RemoteViews(context.packageName, R.layout.hints_widget_layout)
-
-            val repository = ConditionDbRepository(ConditionDbHelper(context))
-            val model = ModelImpl(repository)
-            val assistantContext = AssistantContext(null, Date())
-            model.getHintsForContext(assistantContext).subscribe { hints ->
-                hints.map { (_, title, action) ->
-                    val button = RemoteViews(context.packageName, R.layout.hint_widget)
-                    button.setTextViewText(R.id.widget_hint_text, title)
-                    val intent = action.makeIntent(context)
-                    val pendingIntent = PendingIntent.getActivity(context, 0, intent, 0)
-                    button.setOnClickPendingIntent(R.id.widget_hint_text, pendingIntent)
-                    button
-                }
-                        .forEach { views.addView(R.id.containter_hints_widget, it) }
-            }
-            appWidgetManager.updateAppWidget(id, views)
+//            val views = RemoteViews(context.packageName, R.layout.hints_widget_layout)
+//
+//            val repository = ConditionDbRepository(ConditionDbHelper(context))
+//            val model = ModelImpl(repository)
+//            val assistantContext = AssistantContext(null, Date())
+//            model.getHintsForContext(assistantContext).subscribe { hints ->
+//                hints.map { (_, title, action) ->
+//                    val button = RemoteViews(context.packageName, R.layout.hint_widget)
+//                    button.setTextViewText(R.id.widget_hint_text, title)
+//                    val intent = action.makeIntent(context)
+//                    val pendingIntent = PendingIntent.getActivity(context, 0, intent, 0)
+//                    button.setOnClickPendingIntent(R.id.widget_hint_text, pendingIntent)
+//                    button
+//                }
+//                        .forEach { views.addView(R.id.containter_hints_widget, it) }
+//            }
+//            appWidgetManager.updateAppWidget(id, views)
         }
     }
 }

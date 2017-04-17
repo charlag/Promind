@@ -1,5 +1,6 @@
 package com.charlag.promind.hints_screen
 
+import com.charlag.promind.AppDataSource
 import com.charlag.promind.LocationProvider
 import com.charlag.promind.core.Model
 import com.charlag.promind.core.context_data.DateProvider
@@ -14,6 +15,7 @@ import dagger.Provides
 class HintsScreenModule {
     @Provides
     fun providesViewModel(model: Model, dateProvider: DateProvider,
-                          locationProvider: LocationProvider): HintsScreenViewModel =
-            HintsScreenViewModelImpl(model, locationProvider, dateProvider)
+                          locationProvider: LocationProvider,
+                          appDataSource: AppDataSource): HintsScreenViewModel =
+            HintsScreenViewModelImpl(model, locationProvider, dateProvider, appDataSource)
 }

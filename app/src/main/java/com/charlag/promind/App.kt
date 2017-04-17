@@ -23,6 +23,7 @@ class App : Application() {
                 .conditionRepositoryModule(ConditionRepositoryModule())
                 .contextDataModule(ContextDataModule())
                 .modelModule(ModelModule())
+                .appDataSourceModule(AppDataSourceModule())
                 .build()
     }
 }

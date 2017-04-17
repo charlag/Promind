@@ -2,6 +2,7 @@ package com.charlag.promind
 
 import com.charlag.promind.core.AssistantContext
 import com.charlag.promind.core.ModelImpl
+import com.charlag.promind.core.UsageStatsSource
 import com.charlag.promind.core.UserHint
 import com.charlag.promind.core.data.Action
 import com.charlag.promind.core.data.Condition
@@ -37,7 +38,10 @@ class ModelImplTest {
         val testCondition = Condition(null, 6 * 60, 11 * 60, null, expectedHint)
 
         val repo = TestRepository(listOf(testCondition))
-        val obj = ModelImpl(repo)
+        val statsSource = object : UsageStatsSource {
+            override fun getPackagesUsed(): List<String> = arrayListOf()
+        }
+        val obj = ModelImpl(repo, statsSource)
         val time = Calendar.getInstance().run {
             set(Calendar.HOUR_OF_DAY, 7)
             time

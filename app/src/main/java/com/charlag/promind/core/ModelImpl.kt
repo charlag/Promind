@@ -1,5 +1,6 @@
 package com.charlag.promind.core
 
+import com.charlag.promind.core.data.Action
 import com.charlag.promind.core.data.Condition
 import com.charlag.promind.core.data.source.ConditionRepository
 import io.reactivex.Observable
@@ -12,8 +13,8 @@ import java.util.*
  * matching conditions.
  */
 
-// TODO: make package scoped
-class ModelImpl(private val repository: ConditionRepository) : Model {
+class ModelImpl(private val repository: ConditionRepository,
+                private val statsSource: UsageStatsSource) : Model {
 
     override fun getHintsForContext(context: AssistantContext): Observable<List<UserHint>> {
         val time = Calendar.getInstance().run {
@@ -21,9 +22,16 @@ class ModelImpl(private val repository: ConditionRepository) : Model {
             get(Calendar.HOUR_OF_DAY) * 60 + get(Calendar.MINUTE)
         }
 
+
         return repository.getConditions(time, context.date)
                 .filterByConditions(context)
-                .map { conditions -> conditions.map(Condition::hint) }
+                .map { conditions ->
+                    val statsHints = statsSource.getPackagesUsed()
+                            .map { UserHint(-1, it, Action.OpenMainAction(it)) }
+                    val hints = conditions.map(Condition::hint).toMutableList()
+                    hints.addAll(statsHints)
+                    hints
+                }
     }
 
     private fun Observable<List<Condition>>.filterByConditions(context: AssistantContext):
