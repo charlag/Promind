@@ -28,9 +28,7 @@ class ModelImpl(private val repository: ConditionRepository,
                 .map { conditions ->
                     val statsHints = statsSource.getPackagesUsed()
                             .map { UserHint(-1, it, Action.OpenMainAction(it)) }
-                    val hints = conditions.map(Condition::hint).toMutableList()
-                    hints.addAll(statsHints)
-                    hints
+                    conditions.map { it.hint } + statsHints
                 }
     }
 

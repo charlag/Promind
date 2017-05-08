@@ -4,7 +4,6 @@ import android.Manifest.permission.ACCESS_COARSE_LOCATION
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
-import android.provider.Settings
 import android.support.v4.app.ActivityCompat
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
@@ -16,16 +15,17 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import com.charlag.promind.hints_screen.DaggerHintsComponent
+import com.charlag.promind.hints_screen.HintsScreenContract
 import com.charlag.promind.hints_screen.HintsScreenModule
-import com.charlag.promind.hints_screen.HintsScreenViewModel
 import com.charlag.promind.new_hint.NewHintActivity
 import com.charlag.promind.util.view.findView
-import java.util.*
+import io.reactivex.Observable
+import io.reactivex.subjects.PublishSubject
 import javax.inject.Inject
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), HintsScreenContract.View {
 
-    @Inject lateinit var viewModel: HintsScreenViewModel
+    @Inject lateinit var presenter: HintsScreenContract.Presenter
 
     lateinit var hintsListView: RecyclerView
 
@@ -67,6 +67,8 @@ class MainActivity : AppCompatActivity() {
                 .forEach { getHints() }
     }
 
+    override val hintSelected: Observable<Int> = adapter.clicks
+
     private fun getHints() {
         // Silence permission warning
         // Android linter is too stupid to silence the warning even if
@@ -76,25 +78,20 @@ class MainActivity : AppCompatActivity() {
         }
         DaggerHintsComponent.builder()
                 .appComponent(App.graph)
-                .hintsScreenModule(HintsScreenModule())
+                .hintsScreenModule(HintsScreenModule(this))
                 .build()
                 .inject(this)
 
-        viewModel.hints.subscribe { hints ->
+        presenter.hints.subscribe { hints ->
             adapter.items.clear()
             adapter.items.addAll(hints)
             adapter.notifyDataSetChanged()
-//            hintsTextView.text = hints.foldRight(StringBuilder()) { (title), sb ->
-//                sb.append(title)
-//                sb.append('\n')
-//            }
-//                    .toString()
         }
     }
 
-    class HintsAdapter :
-            RecyclerView.Adapter<HintsAdapter.ViewHolder>() {
+    class HintsAdapter : RecyclerView.Adapter<HintsAdapter.ViewHolder>() {
 
+        val clicks: PublishSubject<Int> = PublishSubject.create()
         val items: MutableList<HintViewModel> = mutableListOf()
 
         override fun getItemCount(): Int = items.size
@@ -108,13 +105,17 @@ class MainActivity : AppCompatActivity() {
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
             val view = LayoutInflater.from(parent.context)
                     .inflate(R.layout.view_hint, parent, false)
-            return ViewHolder(view)
+            return ViewHolder(view, clicks)
         }
 
-        class ViewHolder(itemView: View) :
-                RecyclerView.ViewHolder(itemView) {
+        class ViewHolder(itemView: View, val clicks: PublishSubject<Int>) :
+                RecyclerView.ViewHolder(itemView), View.OnClickListener {
             val image: ImageView = itemView.findView(R.id.iv_hint_icon)
             val title: TextView = itemView.findView(R.id.tv_hint_title)
+
+            override fun onClick(v: View) {
+                clicks.onNext(adapterPosition)
+            }
         }
     }
 }

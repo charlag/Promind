@@ -17,7 +17,7 @@ import javax.inject.Singleton
 
 @Singleton
 @Component(modules = arrayOf(AppModule::class, ModelModule::class, ConditionRepositoryModule::class,
-        HintsScreenModule::class, ContextDataModule::class, AppDataSourceModule::class))
+        HintsScreenModule::class, ContextDataModule::class, AppDataSourceModule::class, ActionHandlerModule::class))
 interface AppComponent {
     fun appContext(): Context
     fun model(): Model
@@ -25,4 +25,5 @@ interface AppComponent {
     fun locationProvider(): LocationProvider
     fun conditionRespository(): ConditionRepository
     fun appDataSource(): AppDataSource
+    fun actionHandler(): ActionHandler
 }
