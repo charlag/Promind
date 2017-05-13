@@ -4,6 +4,7 @@ import android.Manifest.permission.ACCESS_COARSE_LOCATION
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.support.design.widget.FloatingActionButton
 import android.support.v4.app.ActivityCompat
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
@@ -11,7 +12,6 @@ import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import com.charlag.promind.hints_screen.DaggerHintsComponent
@@ -47,7 +47,7 @@ class MainActivity : AppCompatActivity(), HintsScreenContract.View {
             getHints()
         }
 
-        val addButton = findViewById(R.id.btn_add) as Button
+        val addButton = findViewById(R.id.btn_add) as FloatingActionButton
         addButton.setOnClickListener {
             startActivity(Intent(this, NewHintActivity::class.java))
         }
@@ -112,6 +112,10 @@ class MainActivity : AppCompatActivity(), HintsScreenContract.View {
                 RecyclerView.ViewHolder(itemView), View.OnClickListener {
             val image: ImageView = itemView.findView(R.id.iv_hint_icon)
             val title: TextView = itemView.findView(R.id.tv_hint_title)
+
+            init {
+                itemView.setOnClickListener(this)
+            }
 
             override fun onClick(v: View) {
                 clicks.onNext(adapterPosition)

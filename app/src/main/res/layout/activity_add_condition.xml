@@ -11,7 +11,8 @@
     <EditText
         android:id="@+id/et_title"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content"
+        android:hint="Title"/>
 
     <Spinner
         android:id="@+id/picker_type"
@@ -27,19 +28,19 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <EditText
-            android:id="@+id/et_time_from"
+        <Button
+            android:id="@+id/btn_time_from"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:inputType="time"/>
+            android:text="From time..."/>
 
-        <EditText
-            android:id="@+id/et_time_to"
+        <Button
+            android:id="@+id/btn_time_to"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:inputType="time"/>
+            android:text="To time..."/>
     </LinearLayout>
 
     <Button

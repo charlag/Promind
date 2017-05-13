@@ -10,6 +10,7 @@ import com.charlag.promind.core.context_data.DateProvider
 import com.charlag.promind.core.data.Action
 import io.reactivex.Observable
 import io.reactivex.functions.BiFunction
+import io.reactivex.subjects.ReplaySubject
 
 /**
  * Created by charlag on 27/03/2017.
@@ -21,22 +22,25 @@ class HintsScreenPresenter(private val model: Model,
                            private val dateProvider: DateProvider,
                            private val appDataSource: AppDataSource,
                            actionHandler: ActionHandler)
+
     : HintsScreenContract.Presenter {
 
-    val realHints: Observable<List<UserHint>> =
-            Observable.just(AssistantContext(null, dateProvider.date))
-                    .switchMap { model.getHintsForContext(it) }
+    private val hintsSubject: ReplaySubject<List<UserHint>> = ReplaySubject.createWithSize(1)
 
     init {
+
+        model.getHintsForContext(AssistantContext(null, dateProvider.date))
+                .subscribe(hintsSubject::onNext)
+
         view.hintSelected
-                .withLatestFrom(realHints, BiFunction<Int, List<UserHint>, Action> {
+                .withLatestFrom(hintsSubject, BiFunction<Int, List<UserHint>, Action> {
                     position, hints ->
                     hints[position].action
                 })
                 .subscribe(actionHandler::handle)
     }
 
-    override val hints: Observable<List<HintViewModel>> = realHints.map { hints ->
+    override val hints: Observable<List<HintViewModel>> = hintsSubject.map { hints ->
         hints.map(this::hintToViewModel)
     }
 
