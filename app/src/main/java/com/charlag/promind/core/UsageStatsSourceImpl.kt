@@ -23,12 +23,10 @@ class UsageStatsSourceImpl(private val context: Context) : UsageStatsSource {
             add(Calendar.HOUR_OF_DAY, 1)
             timeInMillis
         }
-        val startTime = Calendar.getInstance().run {
-            get(Calendar.HOUR_OF_DAY)
-        }
+        val startTime = Calendar.getInstance().minutes
         val endTime = Calendar.getInstance().run {
             add(Calendar.HOUR_OF_DAY, 1)
-            get(Calendar.HOUR_OF_DAY)
+            minutes
         }
 
         val events = usageStatsManager.queryEvents(start, end)
@@ -41,7 +39,7 @@ class UsageStatsSourceImpl(private val context: Context) : UsageStatsSource {
                     || event.eventType == UsageEvents.Event.SHORTCUT_INVOCATION) {
                 val eventHour = Calendar.getInstance().run {
                     timeInMillis = event.timeStamp
-                    get(Calendar.HOUR_OF_DAY)
+                    minutes
                 }
                 if (eventHour in startTime..endTime) {
                     packages.add(event.packageName)
@@ -51,3 +49,6 @@ class UsageStatsSourceImpl(private val context: Context) : UsageStatsSource {
         return packages.toList()
     }
 }
+
+private val Calendar.minutes: Int
+    get() = this.get(Calendar.HOUR_OF_DAY) * 60 + this.get(Calendar.MINUTE)
