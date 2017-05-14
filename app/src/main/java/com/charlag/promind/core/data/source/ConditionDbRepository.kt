@@ -7,6 +7,7 @@ import com.charlag.promind.core.data.Action
 import com.charlag.promind.core.data.Condition
 import com.charlag.promind.core.data.Location
 import com.charlag.promind.core.data.source.db.ConditionContract.ConditionEntry
+import com.charlag.promind.core.data.source.db.HintContract.HintEntry
 import com.charlag.promind.core.data.source.db.ConditionDbHelper
 import com.charlag.promind.core.data.source.db.HintContract
 import io.reactivex.Observable
@@ -22,21 +23,29 @@ class ConditionDbRepository(private val dbHelper: ConditionDbHelper) : Condition
     // probably should notify about changes continuously but for now it works like 'Single'
     override fun getConditions(time: Int, date: Date): Observable<List<Condition>> {
 
+        // Huston, we've got a problem
+        // We have to do JOIN here
         return Observable.create { subscriber ->
             val db = dbHelper.readableDatabase
 
-            val selection = "${ConditionEntry.timeFrom} >= $time AND " +
+            val where = "${ConditionEntry.timeFrom} <= $time AND " +
                     "$time <= ${ConditionEntry.timeTo} AND " +
                     "( ${ConditionEntry.date} IS NULL OR " +
                     "DATE(${ConditionEntry.date}) == DATE(${date.time}) )"
 
-            val cursor = db.query(ConditionEntry.tableName, null, selection, null, null, null, null)
+            val query = "SELECT * FROM ${ConditionEntry.tableName} " +
+                "INNER JOIN ${HintEntry.tableName} " +
+                    "ON ${ConditionEntry.tableName}.${ConditionEntry.hint}=" +
+                    "${HintEntry.tableName}.${HintEntry.id} WHERE $where"
+
+            val cursor = db.rawQuery(query, null)
+
             val result = cursor.asSequence()
                     .map { map ->
-                        val hintId = map[HintContract.HintEntry.id] as Long
-                        val hintTitle = map[HintContract.HintEntry.title] as String
-                        val hintType = map[HintContract.HintEntry.type] as String
-                        val hintData = map[HintContract.HintEntry.data] as String?
+                        val hintId = map[HintEntry.id] as Long
+                        val hintTitle = map[HintEntry.title] as String
+                        val hintType = map[HintEntry.type] as String
+                        val hintData = map[HintEntry.data] as String?
                         val action = when (hintType) {
                             HintContract.HintActionType.openMain -> Action.OpenMainAction(hintData!!)
                             HintContract.HintActionType.url -> Action.UriAction(hintData!!)
@@ -44,10 +53,9 @@ class ConditionDbRepository(private val dbHelper: ConditionDbHelper) : Condition
                         }
                         val latitude = map[ConditionEntry.latitude] as Double?
                         val longitude = map[ConditionEntry.longitude] as Double?
-                        val locationInverted = map[ConditionEntry.locationInverted]
-                                as Boolean
-                        val timeForm = map[ConditionEntry.timeFrom] as Int?
-                        val timeTo = map[ConditionEntry.timeTo] as Int?
+                        val locationInverted = map[ConditionEntry.locationInverted] != 0
+                        val timeForm = map[ConditionEntry.timeFrom] as Long?
+                        val timeTo = map[ConditionEntry.timeTo] as Long?
                         val rawDate = map[ConditionEntry.date] as Long?
 
                         val hint = UserHint(hintId, hintTitle, action)
@@ -55,7 +63,7 @@ class ConditionDbRepository(private val dbHelper: ConditionDbHelper) : Condition
                             Location(latitude, longitude)
                         else null
                         val changedDate = rawDate?.let(::Date)
-                        Condition(location, timeForm, timeTo, changedDate, hint,
+                        Condition(location, timeForm?.toInt(), timeTo?.toInt(), changedDate, hint,
                                 locationInverted)
                     }
                     .toList()
@@ -86,6 +94,7 @@ class ConditionDbRepository(private val dbHelper: ConditionDbHelper) : Condition
         values.put(ConditionEntry.timeTo, condition.timeTo)
         values.put(ConditionEntry.date, condition.date?.time)
         values.put(ConditionEntry.hint, hintId)
+        values.put(ConditionEntry.locationInverted, condition.locationInverted)
 
         db.insert(ConditionEntry.tableName, null, values)
 
