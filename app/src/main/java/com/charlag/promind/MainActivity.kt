@@ -1,11 +1,17 @@
 package com.charlag.promind
 
+import android.Manifest
 import android.Manifest.permission.ACCESS_COARSE_LOCATION
+import android.app.AppOpsManager
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.provider.Settings
 import android.support.design.widget.FloatingActionButton
 import android.support.v4.app.ActivityCompat
+import android.support.v4.app.AppOpsManagerCompat
+import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
@@ -18,8 +24,11 @@ import com.charlag.promind.hints_screen.DaggerHintsComponent
 import com.charlag.promind.hints_screen.HintsScreenContract
 import com.charlag.promind.hints_screen.HintsScreenModule
 import com.charlag.promind.new_hint.NewHintActivity
+import com.charlag.promind.util.rx.addTo
 import com.charlag.promind.util.view.findView
 import io.reactivex.Observable
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.subjects.BehaviorSubject
 import io.reactivex.subjects.PublishSubject
 import javax.inject.Inject
 
@@ -30,6 +39,10 @@ class MainActivity : AppCompatActivity(), HintsScreenContract.View {
     lateinit var hintsListView: RecyclerView
 
     val adapter = HintsAdapter()
+    lateinit var appOpsManager: AppOpsManager
+    override val usagePermissionGranted: BehaviorSubject<Boolean> = BehaviorSubject.create()
+
+    private val disposable = CompositeDisposable()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,55 +51,58 @@ class MainActivity : AppCompatActivity(), HintsScreenContract.View {
         hintsListView.layoutManager = LinearLayoutManager(this)
         hintsListView.adapter = adapter
 
-        if (ActivityCompat.checkSelfPermission(this,
-                ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this,
-                    arrayOf(ACCESS_COARSE_LOCATION),
-                    1)
-        } else {
-            getHints()
-        }
+        appOpsManager = getSystemService(Context.APP_OPS_SERVICE) as AppOpsManager
 
         val addButton = findViewById(R.id.btn_add) as FloatingActionButton
         addButton.setOnClickListener {
             startActivity(Intent(this, NewHintActivity::class.java))
         }
 
-        // TODO: add check for permission
-//        startActivity(Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS))
-    }
-
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        permissions.asSequence()
-        permissions.indices
-                .filter {
-                    permissions[it] == ACCESS_COARSE_LOCATION &&
-                            grantResults[it] == PackageManager.PERMISSION_GRANTED
-                }
-                .forEach { getHints() }
-    }
-
-    override val hintSelected: Observable<Int> = adapter.clicks
-
-    private fun getHints() {
-        // Silence permission warning
-        // Android linter is too stupid to silence the warning even if
-        // I checked it and I didn't find another way.
-        if (ActivityCompat.checkSelfPermission(this, ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            return
-        }
         DaggerHintsComponent.builder()
                 .appComponent(App.graph)
-                .hintsScreenModule(HintsScreenModule(this))
+                .hintsScreenModule(HintsScreenModule())
                 .build()
                 .inject(this)
+
+        presenter.attachView(this)
 
         presenter.hints.subscribe { hints ->
             adapter.items.clear()
             adapter.items.addAll(hints)
             adapter.notifyDataSetChanged()
-        }
+        }.addTo(disposable)
+
+        presenter.requestUsagePermission.subscribe {
+            startActivity(Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS))
+        }.addTo(disposable)
+    }
+
+    override fun onStart() {
+        super.onStart()
+        val hasUsagePermission = appOpsManager.checkOpNoThrow(AppOpsManager.OPSTR_GET_USAGE_STATS,
+                android.os.Process.myUid(), packageName) != AppOpsManager.MODE_ALLOWED
+        usagePermissionGranted.onNext(hasUsagePermission)
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>,
+                                            grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        val granted = grantResults.filter { it == PackageManager.PERMISSION_GRANTED }
+                .map { permissions[it] }
+        permissionsGranted.onNext(granted)
+    }
+
+    override val hintSelected: Observable<Int> = adapter.clicks
+
+    override val isLocationPermissionGranted: Boolean
+        get() = ContextCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
+    override val permissionsGranted: BehaviorSubject<List<String>> = BehaviorSubject.create()
+
+    override fun onDestroy() {
+        super.onDestroy()
+        disposable.clear()
+        presenter.detachView()
     }
 
     class HintsAdapter : RecyclerView.Adapter<HintsAdapter.ViewHolder>() {

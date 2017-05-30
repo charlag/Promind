@@ -13,7 +13,7 @@ import io.reactivex.Observable
  * Created by charlag on 08/04/2017.
  */
 
-class LocationProviderImpl(private val context: Context) : LocationProvider {
+class LocationProviderImpl(context: Context) : LocationProvider {
     val locationManger = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
 
     override fun currentLocation(): Observable<Location> =

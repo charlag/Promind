@@ -13,12 +13,12 @@ import dagger.Provides
  */
 
 @Module
-class HintsScreenModule(private val view: HintsScreenContract.View) {
+class HintsScreenModule {
     @Provides
     fun providesViewModel(model: Model, dateProvider: DateProvider,
                           locationProvider: LocationProvider,
                           appDataSource: AppDataSource,
                           actionHandler: ActionHandler): HintsScreenContract.Presenter =
-            HintsScreenPresenter(model, view, locationProvider, dateProvider,
-                    appDataSource, actionHandler)
+            HintsScreenPresenter(model, locationProvider, dateProvider, appDataSource,
+                    actionHandler)
 }

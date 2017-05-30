@@ -1,8 +1,7 @@
 package com.charlag.promind.core.data
 
-import com.charlag.promind.core.data.Location
 import com.charlag.promind.core.UserHint
-import java.util.Date
+import java.util.*
 
 /**
  * Created by charlag on 25/02/2017.

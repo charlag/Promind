@@ -1,5 +1,6 @@
 package com.charlag.promind.core
 
+import com.charlag.promind.AppDataSource
 import com.charlag.promind.core.data.Action
 import com.charlag.promind.core.data.Condition
 import com.charlag.promind.core.data.source.ConditionRepository
@@ -27,7 +28,7 @@ class ModelImpl(private val repository: ConditionRepository,
                 .filterByConditions(context)
                 .map { conditions ->
                     val statsHints = statsSource.getPackagesUsed()
-                            .map { UserHint(-1, it, Action.OpenMainAction(it)) }
+                            .map { UserHint(-1, null, Action.OpenMainAction(it)) }
                     conditions.map { it.hint } + statsHints
                 }
     }
