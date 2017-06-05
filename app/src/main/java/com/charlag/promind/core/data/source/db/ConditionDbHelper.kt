@@ -2,45 +2,41 @@ package com.charlag.promind.core.data.source.db
 
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
-import android.database.sqlite.SQLiteOpenHelper
-
 import com.charlag.promind.core.data.source.db.ConditionContract.ConditionEntry
 import com.charlag.promind.core.data.source.db.HintContract.HintEntry
+import org.jetbrains.anko.db.*
 
 /**
  * Created by charlag on 25/02/2017.
  */
 
-class ConditionDbHelper(context: Context) : SQLiteOpenHelper(context, dbName, null, dbVersion) {
+class ConditionDbHelper(context: Context)
+    : ManagedSQLiteOpenHelper(context, dbName, null, dbVersion) {
     companion object {
-        val dbVersion = 1
+        val dbVersion = 2
         val dbName = "condition.db"
-        val sqlCreateConditions = "CREATE TABLE ${ConditionEntry.tableName} (" +
-                ConditionEntry.id + " INTEGER PRIMARY KEY," +
-                ConditionEntry.latitude + " TEXT," +
-                ConditionEntry.longitude + " TEXT," +
-                ConditionEntry.locationInverted + " INTEGER," +
-                ConditionEntry.timeFrom + " INTEGER," +
-                ConditionEntry.timeTo + " INTEGER," +
-                ConditionEntry.date + " INTEGER," +
-                ConditionEntry.priority + " INTEGER," +
-                ConditionEntry.hint + " INTEGER," +
-                "FOREIGN KEY(${ConditionEntry.hint}) REFERENCES " +
-                "${HintEntry.tableName}(${HintEntry.id}))"
-
-        val sqlCreateHints = "CREATE TABLE ${HintEntry.tableName} (" +
-                HintEntry.id + " INTEGER PRIMARY KEY," +
-                HintEntry.title + " TEXT," +
-                HintEntry.type + " TEXT," +
-                HintEntry.data + " TEXT)"
     }
 
     override fun onCreate(db: SQLiteDatabase) {
-        db.execSQL(sqlCreateConditions)
-        db.execSQL(sqlCreateHints)
+        db.createTable(ConditionEntry.tableName, true,
+                ConditionEntry.id to INTEGER,
+                ConditionEntry.latitude to TEXT,
+                ConditionEntry.longitude to TEXT,
+                ConditionEntry.locationInverted to INTEGER,
+                ConditionEntry.timeFrom to INTEGER,
+                ConditionEntry.timeTo to INTEGER,
+                ConditionEntry.date to INTEGER,
+                ConditionEntry.hint to INTEGER,
+                FOREIGN_KEY(ConditionEntry.hint, HintEntry.tableName, HintEntry.id))
+        db.createTable(HintEntry.tableName, true,
+                HintEntry.id to INTEGER + PRIMARY_KEY + UNIQUE,
+                HintEntry.title to TEXT,
+                HintEntry.type to TEXT,
+                HintEntry.data to TEXT)
     }
 
     override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
-        throw UnsupportedOperationException("not implemented")
+        db?.dropTable(ConditionEntry.tableName, true)
+        db?.dropTable(HintEntry.tableName, true)
     }
 }

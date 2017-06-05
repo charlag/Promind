@@ -3,7 +3,6 @@ package com.charlag.promind.new_hint
 import android.content.Context
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
-import android.view.View
 import com.charlag.promind.core.UserHint
 import com.charlag.promind.core.data.Action
 import com.charlag.promind.core.data.Condition
@@ -19,7 +18,6 @@ import io.reactivex.functions.BiFunction
 import io.reactivex.functions.Function4
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.PublishSubject
-import io.reactivex.subjects.ReplaySubject
 
 /**
  * Created by charlag on 10/04/2017.
@@ -55,7 +53,7 @@ class NewHintPresenterImpl(view: NewHintContract.View, context: Context,
                     val minsTo = to.hours * 60 + to.minutes
                     val action = Action.OpenMainAction(apps[selectedApp].packageName)
                     val hint = UserHint(-1, title, action)
-                    val condition = Condition(null, minsFrom, minsTo, null, hint, false)
+                    val condition = Condition(minsFrom, minsTo, null, null, 10000, false, hint)
                     repository.addCondition(condition)
                 }
 

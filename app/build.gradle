@@ -41,6 +41,11 @@ dependencies {
     compile 'com.google.dagger:dagger:2.10'
     kapt 'com.google.dagger:dagger-compiler:2.10'
 
+    // Anko
+    compile "org.jetbrains.anko:anko-commons:$anko_version"
+    compile "org.jetbrains.anko:anko-sqlite:$anko_version"
+    compile "org.jetbrains.anko:anko-appcompat-v7-commons:$anko_version"
+
     testCompile "org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version"
 
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {

@@ -14,6 +14,7 @@ class ConditionContract {
         val latitude = "latitude"
         val longitude = "longitude"
         val locationInverted = "locationInverted"
+        val radius = "radius"
         val timeFrom = "timeFrom"
         val timeTo = "timeTo"
         val date = "date"

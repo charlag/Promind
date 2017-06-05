@@ -9,5 +9,8 @@ import java.util.*
  * Data class used by database and model to match location and time to the actions
  */
 
-data class Condition(val location: Location?, val timeFrom: Int?, val timeTo: Int?,
-                     val date: Date?, val hint: UserHint, val locationInverted: Boolean = false)
+data class Condition(val timeFrom: Int?, val timeTo: Int?, val date: Date?,
+                     val location: Location?,
+                     val radius: Int,
+                     val locationInverted: Boolean = false,
+                     val hint: UserHint)

@@ -35,7 +35,7 @@ class ModelImplTest {
         val packageName = "com.getsomeheadspace.android"
         val expectedAction = Action.OpenMainAction(packageName)
         val expectedHint = UserHint(1, "Headspace", expectedAction)
-        val testCondition = Condition(null, 6 * 60, 11 * 60, null, expectedHint)
+        val testCondition = Condition(6 * 60, 11 * 60, null, null, hint = expectedHint)
 
         val repo = TestRepository(listOf(testCondition))
         val statsSource = object : UsageStatsSource {

@@ -1,6 +1,5 @@
 package com.charlag.promind.core
 
-import com.charlag.promind.AppDataSource
 import com.charlag.promind.core.data.Action
 import com.charlag.promind.core.data.Condition
 import com.charlag.promind.core.data.source.ConditionRepository
@@ -43,7 +42,7 @@ class ModelImpl(private val repository: ConditionRepository,
     }
 
     private fun filterByLocation(condition: Condition, context: AssistantContext): Boolean {
-        val distanceCriteria = 1000.0
+        val distanceCriteria = condition.radius
         if (condition.location == null) return true
         if (context.location == null) return false
         val distance = condition.location.distanceTo(context.location)

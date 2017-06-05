@@ -1,6 +1,7 @@
 package com.charlag.promind.core.data.source
 
 import android.content.ContentValues
+import android.database.sqlite.SQLiteStatement
 import com.charlag.promind.core.UserHint
 import com.charlag.promind.core.asSequence
 import com.charlag.promind.core.data.Action
@@ -11,6 +12,8 @@ import com.charlag.promind.core.data.source.db.HintContract.HintEntry
 import com.charlag.promind.core.data.source.db.ConditionDbHelper
 import com.charlag.promind.core.data.source.db.HintContract
 import io.reactivex.Observable
+import org.jetbrains.anko.db.asMapSequence
+import org.jetbrains.anko.db.select
 import java.sql.SQLException
 import java.util.*
 
@@ -20,54 +23,60 @@ import java.util.*
 
 class ConditionDbRepository(private val dbHelper: ConditionDbHelper) : ConditionRepository {
 
+    val querySQL: String
+
+    init {
+        val where = "${ConditionEntry.timeFrom} <= ? AND " +
+                "? <= ${ConditionEntry.timeTo} AND " +
+                "( ${ConditionEntry.date} IS NULL OR " +
+                "DATE(${ConditionEntry.date}) == DATE(?) )"
+
+        querySQL = "SELECT * FROM ${ConditionEntry.tableName} " +
+                "INNER JOIN ${HintEntry.tableName} " +
+                "ON ${ConditionEntry.tableName}.${ConditionEntry.hint}=" +
+                "${HintEntry.tableName}.${HintEntry.id} WHERE $where"
+    }
+
     // probably should notify about changes continuously but for now it works like 'Single'
     override fun getConditions(time: Int, date: Date): Observable<List<Condition>> {
-
-        // Huston, we've got a problem
-        // We have to do JOIN here
         return Observable.create { subscriber ->
-            val db = dbHelper.readableDatabase
+            val result = dbHelper.use {
+                val timeString = time.toString()
+                rawQuery(querySQL, arrayOf(timeString, timeString, timeString))
+                        .use {
+                            it.asMapSequence()
+                                    .map { map ->
+                                        val hintId = map[HintEntry.id] as Long
+                                        val hintTitle = map[HintEntry.title] as String
+                                        val hintType = map[HintEntry.type] as String
+                                        val hintData = map[HintEntry.data] as String?
+                                        val action = when (hintType) {
+                                            HintContract.HintActionType.openMain -> Action.OpenMainAction(
+                                                    hintData!!)
+                                            HintContract.HintActionType.url -> Action.UriAction(
+                                                    hintData!!)
+                                            else -> throw SQLException("Failed to map hint type")
+                                        }
+                                        val latitude = map[ConditionEntry.latitude] as Double?
+                                        val longitude = map[ConditionEntry.longitude] as Double?
+                                        val locationInverted = map[ConditionEntry.locationInverted] != 0
+                                        val radius = map[ConditionEntry.radius] as Int
+                                        val timeFrom = map[ConditionEntry.timeFrom] as Long?
+                                        val timeTo = map[ConditionEntry.timeTo] as Long?
+                                        val rawDate = map[ConditionEntry.date] as Long?
 
-            val where = "${ConditionEntry.timeFrom} <= $time AND " +
-                    "$time <= ${ConditionEntry.timeTo} AND " +
-                    "( ${ConditionEntry.date} IS NULL OR " +
-                    "DATE(${ConditionEntry.date}) == DATE(${date.time}) )"
-
-            val query = "SELECT * FROM ${ConditionEntry.tableName} " +
-                "INNER JOIN ${HintEntry.tableName} " +
-                    "ON ${ConditionEntry.tableName}.${ConditionEntry.hint}=" +
-                    "${HintEntry.tableName}.${HintEntry.id} WHERE $where"
-
-            val cursor = db.rawQuery(query, null)
-
-            val result = cursor.asSequence()
-                    .map { map ->
-                        val hintId = map[HintEntry.id] as Long
-                        val hintTitle = map[HintEntry.title] as String
-                        val hintType = map[HintEntry.type] as String
-                        val hintData = map[HintEntry.data] as String?
-                        val action = when (hintType) {
-                            HintContract.HintActionType.openMain -> Action.OpenMainAction(hintData!!)
-                            HintContract.HintActionType.url -> Action.UriAction(hintData!!)
-                            else -> throw SQLException("Failed to map hint type")
+                                        val hint = UserHint(hintId, hintTitle, action)
+                                        val location = if (latitude != null && longitude != null)
+                                            Location(latitude, longitude)
+                                        else null
+                                        val changedDate = rawDate?.let(::Date)
+                                        Condition(timeFrom?.toInt(), timeTo?.toInt(), changedDate,
+                                                location,
+                                                radius, locationInverted, hint)
+                                    }
+                                    .toList()
                         }
-                        val latitude = map[ConditionEntry.latitude] as Double?
-                        val longitude = map[ConditionEntry.longitude] as Double?
-                        val locationInverted = map[ConditionEntry.locationInverted] != 0
-                        val timeForm = map[ConditionEntry.timeFrom] as Long?
-                        val timeTo = map[ConditionEntry.timeTo] as Long?
-                        val rawDate = map[ConditionEntry.date] as Long?
-
-                        val hint = UserHint(hintId, hintTitle, action)
-                        val location = if (latitude != null && longitude != null)
-                            Location(latitude, longitude)
-                        else null
-                        val changedDate = rawDate?.let(::Date)
-                        Condition(location, timeForm?.toInt(), timeTo?.toInt(), changedDate, hint,
-                                locationInverted)
-                    }
-                    .toList()
-            cursor.close()
+            }
 
             subscriber.onNext(result)
             subscriber.onComplete()
@@ -92,6 +101,7 @@ class ConditionDbRepository(private val dbHelper: ConditionDbHelper) : Condition
         values.put(ConditionEntry.longitude, condition.location?.longitude)
         values.put(ConditionEntry.timeFrom, condition.timeFrom)
         values.put(ConditionEntry.timeTo, condition.timeTo)
+        values.put(ConditionEntry.radius, condition.radius)
         values.put(ConditionEntry.date, condition.date?.time)
         values.put(ConditionEntry.hint, hintId)
         values.put(ConditionEntry.locationInverted, condition.locationInverted)
