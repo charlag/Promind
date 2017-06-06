@@ -23,6 +23,7 @@ import io.reactivex.rxkotlin.Observables
 import io.reactivex.subjects.BehaviorSubject
 import io.reactivex.subjects.PublishSubject
 import io.reactivex.subjects.ReplaySubject
+import java.util.concurrent.TimeUnit
 
 /**
  * Created by charlag on 27/03/2017.
@@ -38,10 +39,14 @@ class HintsScreenPresenter(private val model: Model,
     private val permissionGrantedInput: PublishSubject<List<String>> = PublishSubject.create()
     private val hintSelectedInput: PublishSubject<Int> = PublishSubject.create()
     private val usagePermissionGrantedInput: PublishSubject<Boolean> = PublishSubject.create()
+    private val refreshedInput: PublishSubject<Empty> = PublishSubject.create()
+    private val usagePermissionClickedInput: PublishSubject<Empty> = PublishSubject.create()
 
     private val hintsSubject: ReplaySubject<List<UserHint>> = ReplaySubject.createWithSize(1)
     private val requestLocationPermissionSubject: PublishSubject<Empty> = PublishSubject.create()
     private val requestUsagePermissionSubject: BehaviorSubject<Empty> = BehaviorSubject.create()
+    override val refreshing: BehaviorSubject<Boolean> = BehaviorSubject.create()
+    override val showUsagePermissionInfo: BehaviorSubject<Boolean> = BehaviorSubject.create()
 
     private val disposable = CompositeDisposable()
 
@@ -51,10 +56,13 @@ class HintsScreenPresenter(private val model: Model,
                 .map { it.toOptional() }
                 .startWith(Optional.empty<Location>())
 
-        Observables.combineLatest(usagePermissionGrantedInput.startWith(false), location)
-        { _, location -> location }
+        Observables.combineLatest(usagePermissionGrantedInput.startWith(false), location,
+                refreshedInput.startWith(Empty)) { _, location, _ -> location }
+                .throttleFirst(800, TimeUnit.MILLISECONDS)
                 .switchMap { location ->
+                    refreshing.onNext(true)
                     model.getHintsForContext(AssistantContext(location.orNull(), dateProvider.date))
+                            .doOnEach { refreshing.onNext(false) }
                             .onErrorComplete()
                 }.subscribe(hintsSubject::onNext)
 
@@ -63,6 +71,13 @@ class HintsScreenPresenter(private val model: Model,
                     position, hints ->
                     hints[position].action
                 }).subscribe(actionHandler::handle)
+
+        usagePermissionGrantedInput.subscribe { showUsagePermissionInfo.onNext(!it) }
+                .addTo(disposable)
+
+        usagePermissionClickedInput.subscribe {
+            requestUsagePermissionSubject.onNext(Empty)
+        }.addTo(disposable)
     }
 
     override val hints: Observable<List<HintViewModel>> = hintsSubject.map { hints ->
@@ -86,6 +101,9 @@ class HintsScreenPresenter(private val model: Model,
         v.permissionsGranted.subscribe(permissionGrantedInput::onNext).addTo(disposable)
         v.hintSelected.subscribe(hintSelectedInput::onNext).addTo(disposable)
         v.usagePermissionGranted.subscribe(usagePermissionGrantedInput::onNext).addTo(disposable)
+        v.refreshed.subscribe(refreshedInput::onNext).addTo(disposable)
+        v.requestUsagePermissionClicked.subscribe(usagePermissionClickedInput::onNext).addTo(
+                disposable)
         if (!v.isLocationPermissionGranted) requestLocationPermissionSubject.onNext(Empty)
     }
 

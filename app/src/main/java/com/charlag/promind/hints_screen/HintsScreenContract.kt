@@ -13,6 +13,8 @@ class HintsScreenContract private constructor() {
         val hints: Observable<List<HintViewModel>>
         val requestLocationPermission: Observable<Empty>
         val requestUsagePermission: Observable<Empty>
+        val refreshing: Observable<Boolean>
+        val showUsagePermissionInfo: Observable<Boolean>
     }
 
     interface View {
@@ -20,5 +22,7 @@ class HintsScreenContract private constructor() {
         val permissionsGranted: Observable<List<String>>
         val hintSelected: Observable<Int>
         val usagePermissionGranted: Observable<Boolean>
+        val refreshed: Observable<Empty>
+        val requestUsagePermissionClicked: Observable<Empty>
     }
 }
