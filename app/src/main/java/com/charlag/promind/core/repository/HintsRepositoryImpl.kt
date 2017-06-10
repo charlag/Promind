@@ -16,7 +16,7 @@ import io.reactivex.Observable
  */
 
 class HintsRepositoryImpl(val model: Model,
-                          val locationProvider: LocationProvider,
+                          locationProvider: LocationProvider,
                           val dateProvider: DateProvider) : HintsRepository {
     override val hints: Observable<List<UserHint>> = locationProvider.currentLocation()
             .map { it.toOptional() }

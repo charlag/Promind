@@ -19,7 +19,7 @@ fun Action.makeIntent(context: Context): Intent =
         }
 
 private fun getLaunchIntent(context: Context, packageName: String): Intent {
-    val intent = context.packageManager.getLaunchIntentForPackage(packageName)
+    val intent = context.packageManager.getLaunchIntentForPackage(packageName) ?: return Intent()
     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
     return intent
 }
