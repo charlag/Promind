@@ -1,8 +1,8 @@
 package com.charlag.promind.core
 
-import com.charlag.promind.core.data.Action
-import com.charlag.promind.core.data.Condition
-import com.charlag.promind.core.data.source.ConditionRepository
+import com.charlag.promind.core.data.models.Action
+import com.charlag.promind.core.data.models.Condition
+import com.charlag.promind.core.data.source.ConditionDAO
 import io.reactivex.Observable
 import java.util.*
 
@@ -13,7 +13,7 @@ import java.util.*
  * matching conditions.
  */
 
-class ModelImpl(private val repository: ConditionRepository,
+class ModelImpl(private val repository: ConditionDAO,
                 private val statsSource: UsageStatsSource) : Model {
 
     override fun getHintsForContext(context: AssistantContext): Observable<List<UserHint>> {
@@ -42,9 +42,9 @@ class ModelImpl(private val repository: ConditionRepository,
     }
 
     private fun filterByLocation(condition: Condition, context: AssistantContext): Boolean {
-        val distanceCriteria = condition.radius
-        if (condition.location == null) return true
+        if (condition.location == null || condition.radius == null) return true
         if (context.location == null) return false
+        val distanceCriteria = condition.radius
         val distance = condition.location.distanceTo(context.location)
         return if (condition.locationInverted) distance > distanceCriteria
         else distance < distanceCriteria

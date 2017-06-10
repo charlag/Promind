@@ -1,7 +1,7 @@
 package com.charlag.promind.core
 
 
-import com.charlag.promind.core.data.Location
+import com.charlag.promind.core.data.models.Location
 import java.util.*
 
 /**

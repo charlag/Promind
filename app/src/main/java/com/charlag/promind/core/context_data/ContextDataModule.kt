@@ -1,7 +1,6 @@
 package com.charlag.promind.core.context_data
 
 import android.content.Context
-import com.charlag.promind.LocationProvider
 import dagger.Module
 import dagger.Provides
 

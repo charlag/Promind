@@ -9,13 +9,13 @@
         tools:ignore="ProtectedPermissions" />
 
     <application
-        android:name=".App"
+        android:name=".app.App"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".MainActivity">
+        <activity android:name=".ui.component.hints_screen.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
@@ -24,7 +24,7 @@
         </activity>
 
         <receiver
-            android:name=".HintsWidgetProvider"
+            android:name=".ui.component.widget.HintsWidgetProvider"
             android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
@@ -35,7 +35,7 @@
                 android:resource="@xml/hints_widget_info"/>
         </receiver>
 
-        <activity android:name=".new_hint.NewHintActivity">
+        <activity android:name="com.charlag.promind.ui.component.new_hint.NewHintActivity">
         </activity>
     </application>
 

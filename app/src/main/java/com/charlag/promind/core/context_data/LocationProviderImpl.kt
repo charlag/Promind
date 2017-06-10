@@ -5,8 +5,7 @@ import android.location.Criteria
 import android.location.LocationListener
 import android.location.LocationManager
 import android.os.Bundle
-import com.charlag.promind.LocationProvider
-import com.charlag.promind.core.data.Location
+import com.charlag.promind.core.data.models.Location
 import io.reactivex.Observable
 
 /**

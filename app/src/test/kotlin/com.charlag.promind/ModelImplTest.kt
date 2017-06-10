@@ -4,9 +4,9 @@ import com.charlag.promind.core.AssistantContext
 import com.charlag.promind.core.ModelImpl
 import com.charlag.promind.core.UsageStatsSource
 import com.charlag.promind.core.UserHint
-import com.charlag.promind.core.data.Action
-import com.charlag.promind.core.data.Condition
-import com.charlag.promind.core.data.source.ConditionRepository
+import com.charlag.promind.core.data.models.Action
+import com.charlag.promind.core.data.models.Condition
+import com.charlag.promind.core.data.source.ConditionDAO
 import io.reactivex.Observable
 import org.junit.Test
 import java.util.*
@@ -18,7 +18,7 @@ import kotlin.test.assertNotNull
 
 class ModelImplTest {
 
-    class TestRepository(val conditions: List<Condition>) : ConditionRepository {
+    class TestRepository(val conditions: List<Condition>) : ConditionDAO {
         override fun addCondition(condition: Condition) {
             TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
         }
@@ -35,7 +35,7 @@ class ModelImplTest {
         val packageName = "com.getsomeheadspace.android"
         val expectedAction = Action.OpenMainAction(packageName)
         val expectedHint = UserHint(1, "Headspace", expectedAction)
-        val testCondition = Condition(6 * 60, 11 * 60, null, null, hint = expectedHint)
+        val testCondition = Condition(6 * 60, 11 * 60, null, null, hint = expectedHint, radius = null)
 
         val repo = TestRepository(listOf(testCondition))
         val statsSource = object : UsageStatsSource {

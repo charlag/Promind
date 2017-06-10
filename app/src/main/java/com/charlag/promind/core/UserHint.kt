@@ -1,6 +1,6 @@
 package com.charlag.promind.core
 
-import com.charlag.promind.core.data.Action
+import com.charlag.promind.core.data.models.Action
 
 /**
  * Created by charlag on 11/02/2017.
