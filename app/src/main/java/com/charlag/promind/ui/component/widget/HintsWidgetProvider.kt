@@ -4,6 +4,10 @@ import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider
 import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.drawable.BitmapDrawable
+import android.graphics.drawable.Drawable
 import android.widget.RemoteViews
 import com.charlag.promind.R
 import com.charlag.promind.app.App
@@ -19,7 +23,6 @@ import javax.inject.Inject
 class HintsWidgetProvider : AppWidgetProvider() {
 
     @Inject lateinit var repository: HintsRepository
-    @Inject lateinit var appDataProvider: AppDataProvider
 
     override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager,
                           appWidgetIds: IntArray) {
@@ -38,16 +41,29 @@ class HintsWidgetProvider : AppWidgetProvider() {
                     .doOnTerminate { result.finish() }
                     .subscribe { hints ->
                         hints.map { hint ->
-                            val button = RemoteViews(context.packageName, R.layout.hint_widget)
-                            button.setTextViewText(R.id.widget_hint_text, hint.title)
+                            val hintView = RemoteViews(context.packageName,
+                                    R.layout.hint_widget)
+                            hintView.setTextViewText(R.id.widget_hint_text, hint.title)
                             val intent = hint.action.makeIntent(context)
-                            val pendingIntent = PendingIntent.getActivity(context, 0, intent, 0)
-                            button.setOnClickPendingIntent(R.id.widget_hint_text, pendingIntent)
-                            button
+                            val pendingIntent = PendingIntent.getActivity(context, 0,
+                                    intent, 0)
+                            hintView.setOnClickPendingIntent(R.id.widget_hint_text,
+                                    pendingIntent)
+                            hintView
                         }.forEach { views.addView(R.id.containter_hints_widget, it) }
                         appWidgetManager.updateAppWidget(id, views)
                     }
 
         }
+    }
+
+    private fun drawableToBitmap(drawable: Drawable): Bitmap? {
+        if (drawable is BitmapDrawable) return drawable.bitmap
+        val bitmap = Bitmap.createBitmap(drawable.intrinsicWidth, drawable.intrinsicHeight,
+                Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(bitmap)
+        drawable.setBounds(0, 0, canvas.width, canvas.height)
+        drawable.draw(canvas)
+        return bitmap
     }
 }
