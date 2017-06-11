@@ -12,6 +12,7 @@ import com.charlag.promind.core.data.source.ConditionDAO
 import com.charlag.promind.core.data.source.ConditionDAOModule
 import com.charlag.promind.core.repository.HintsRepository
 import com.charlag.promind.core.repository.HintsRepositoryModule
+import com.charlag.promind.core.stats.UsageStatsModule
 import com.charlag.promind.ui.component.hints_screen.HintsScreenModule
 
 /**
@@ -21,7 +22,7 @@ import com.charlag.promind.ui.component.hints_screen.HintsScreenModule
 @javax.inject.Singleton
 @dagger.Component(modules = arrayOf(AppModule::class, ModelModule::class, ConditionDAOModule::class,
         HintsScreenModule::class, ContextDataModule::class, ActionHandlerModule::class,
-        HintsRepositoryModule::class))
+        HintsRepositoryModule::class, UsageStatsModule::class))
 interface AppComponent {
     fun appContext(): Context
     fun model(): Model

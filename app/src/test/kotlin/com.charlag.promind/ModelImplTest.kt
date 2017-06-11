@@ -2,7 +2,7 @@ package com.charlag.promind
 
 import com.charlag.promind.core.AssistantContext
 import com.charlag.promind.core.ModelImpl
-import com.charlag.promind.core.UsageStatsSource
+import com.charlag.promind.core.stats.UsageStatsSource
 import com.charlag.promind.core.UserHint
 import com.charlag.promind.core.data.models.Action
 import com.charlag.promind.core.data.models.Condition
@@ -34,12 +34,12 @@ class ModelImplTest {
         // given
         val packageName = "com.getsomeheadspace.android"
         val expectedAction = Action.OpenMainAction(packageName)
-        val expectedHint = UserHint(1, "Headspace", expectedAction)
+        val expectedHint = UserHint(1, "Headspace", null, expectedAction)
         val testCondition = Condition(6 * 60, 11 * 60, null, null, hint = expectedHint, radius = null)
 
         val repo = TestRepository(listOf(testCondition))
         val statsSource = object : UsageStatsSource {
-            override fun getPackagesUsed(): List<String> = arrayListOf()
+            override fun getPackagesUsed(): List<UserHint> = arrayListOf()
         }
         val obj = ModelImpl(repo, statsSource)
         val time = Calendar.getInstance().run {

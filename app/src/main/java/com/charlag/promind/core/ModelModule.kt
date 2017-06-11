@@ -2,6 +2,8 @@ package com.charlag.promind.core
 
 import android.content.Context
 import com.charlag.promind.core.data.source.ConditionDAO
+import com.charlag.promind.core.stats.UsageStatsSource
+import com.charlag.promind.core.stats.UsageStatsSourceImpl
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
@@ -16,8 +18,5 @@ class ModelModule {
     @Singleton
     fun providesModel(repository: ConditionDAO, usageStatsSource: UsageStatsSource): Model =
             ModelImpl(repository, usageStatsSource)
-
-    @Provides
-    @Singleton
-    fun providesUsageStatsSource(context: Context): UsageStatsSource = UsageStatsSourceImpl(context)
+    
 }

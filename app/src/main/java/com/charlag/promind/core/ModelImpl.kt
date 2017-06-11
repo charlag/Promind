@@ -1,8 +1,8 @@
 package com.charlag.promind.core
 
-import com.charlag.promind.core.data.models.Action
 import com.charlag.promind.core.data.models.Condition
 import com.charlag.promind.core.data.source.ConditionDAO
+import com.charlag.promind.core.stats.UsageStatsSource
 import io.reactivex.Observable
 import java.util.*
 

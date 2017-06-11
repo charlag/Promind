@@ -5,6 +5,7 @@ import com.charlag.promind.core.ModelModule
 import com.charlag.promind.core.context_data.ContextDataModule
 import com.charlag.promind.core.data.source.ConditionDAOModule
 import com.charlag.promind.core.repository.HintsRepositoryModule
+import com.charlag.promind.core.stats.UsageStatsModule
 
 /**
  * Created by charlag on 25/03/2017.
@@ -24,6 +25,7 @@ class App : Application() {
                 .conditionDAOModule(ConditionDAOModule())
                 .contextDataModule(ContextDataModule())
                 .modelModule(ModelModule())
+                .usageStatsModule(UsageStatsModule())
                 .hintsRepositoryModule(HintsRepositoryModule())
                 .build()
     }
