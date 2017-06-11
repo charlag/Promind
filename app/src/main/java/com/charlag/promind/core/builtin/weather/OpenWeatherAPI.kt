@@ -12,7 +12,10 @@ import retrofit2.http.Query
 
 interface OpenWeatherAPI {
     @GET("data/2.5/weather") fun weatherByCoordinates(@Query("lat") lat: Double,
-                                                      @Query("lon") lon: Double): Single<Weather>
+                                                      @Query("lon") lon: Double,
+                                                      @Query("units") units: String):
+            Single<Weather>
+
     @GET("http://openweathermap.org/img/w/{id}.png") fun getIcon(@Path("id") id: String):
             Single<ResponseBody>
 }

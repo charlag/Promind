@@ -24,7 +24,7 @@ class WeatherHintsProviderImpl(val openWeatherAPI: OpenWeatherAPI,
         if (context.location == null) return Maybe.empty()
 
         return openWeatherAPI.weatherByCoordinates(context.location.latitude,
-                context.location.longitude)
+                context.location.longitude, "metric")
                 .doOnError { Log.e(TAG, "Coudln't fetch weather", it) }
                 .flatMapMaybe { weather ->
                     val icon: Maybe<Bitmap> = weather.weather.firstOrNull()?.icon?.let {
