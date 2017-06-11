@@ -1,6 +1,8 @@
 package com.charlag.promind.core
 
 import android.content.Context
+import com.charlag.promind.core.builtin.weather.WeatherHintsModule
+import com.charlag.promind.core.builtin.weather.WeatherHintsProvider
 import com.charlag.promind.core.data.source.ConditionDAO
 import com.charlag.promind.core.stats.UsageStatsSource
 import com.charlag.promind.core.stats.UsageStatsSourceImpl
@@ -16,7 +18,8 @@ import javax.inject.Singleton
 class ModelModule {
     @Provides
     @Singleton
-    fun providesModel(repository: ConditionDAO, usageStatsSource: UsageStatsSource): Model =
-            ModelImpl(repository, usageStatsSource)
-    
+    fun providesModel(repository: ConditionDAO, usageStatsSource: UsageStatsSource,
+                      weatherHintsProvider: WeatherHintsProvider): Model =
+            ModelImpl(repository, usageStatsSource, weatherHintsProvider)
+
 }

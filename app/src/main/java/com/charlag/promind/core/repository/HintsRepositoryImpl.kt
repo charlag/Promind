@@ -1,5 +1,6 @@
 package com.charlag.promind.core.repository
 
+import android.util.Log
 import com.charlag.promind.core.AssistantContext
 import com.charlag.promind.core.Model
 import com.charlag.promind.core.UserHint
@@ -18,8 +19,12 @@ import io.reactivex.Observable
 class HintsRepositoryImpl(val model: Model,
                           locationProvider: LocationProvider,
                           val dateProvider: DateProvider) : HintsRepository {
+    companion object {
+        private val TAG = HintsRepositoryImpl::class.java.simpleName
+    }
     override val hints: Observable<List<UserHint>> = locationProvider.currentLocation()
             .map { it.toOptional() }
+            .doOnError { Log.e(TAG, "Error while observing locaiton", it) }
             .onErrorReturn { Optional.empty() }
             .startWith(Optional.empty<Location>())
             .switchMap { location ->

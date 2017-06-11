@@ -1,5 +1,7 @@
 package com.charlag.promind.core
 
+import com.charlag.promind.core.builtin.weather.WeatherHintsModule
+import com.charlag.promind.core.builtin.weather.WeatherHintsProvider
 import com.charlag.promind.core.data.models.Condition
 import com.charlag.promind.core.data.source.ConditionDAO
 import com.charlag.promind.core.stats.UsageStatsSource
@@ -14,7 +16,8 @@ import java.util.*
  */
 
 class ModelImpl(private val repository: ConditionDAO,
-                private val statsSource: UsageStatsSource) : Model {
+                private val statsSource: UsageStatsSource,
+                private val weatherHintsProvider: WeatherHintsProvider) : Model {
 
     override fun getHintsForContext(context: AssistantContext): Observable<List<UserHint>> {
         val time = Calendar.getInstance().run {
@@ -26,7 +29,11 @@ class ModelImpl(private val repository: ConditionDAO,
         return repository.getConditions(time, context.date)
                 .filterByConditions(context)
                 .map { conditions ->
-                    conditions.map { it.hint } + statsSource.getPackagesUsed()
+                    val weatherHints = weatherHintsProvider.weatherHints(
+                            context).onErrorReturn { listOf() }.blockingGet() ?: listOf()
+                    conditions.map { it.hint } +
+                            weatherHints +
+                            statsSource.getPackagesUsed()
                 }
     }
 

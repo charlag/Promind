@@ -4,6 +4,7 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.os.Looper
 import android.widget.RemoteViews
 import android.widget.RemoteViewsService
 import com.charlag.promind.R
@@ -29,9 +30,6 @@ class HintRemoteViewsFactory(val context: Context,
     @Inject lateinit var repository: HintsRepository
     val hints = mutableListOf<UserHint>()
 
-//    val appWidgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID,
-//            AppWidgetManager.INVALID_APPWIDGET_ID)
-
     override fun onCreate() {
         DaggerHintsWidgetComponent.builder()
                 .appComponent(App.graph)
@@ -43,11 +41,15 @@ class HintRemoteViewsFactory(val context: Context,
     override fun getItemId(position: Int): Long = position.toLong()
 
     override fun onDataSetChanged() {
+        // kind of a hack to subscribe to location updates
+        if (Looper.myLooper() == null) Looper.prepare()
+        // kind of a hack to get data but not wait forever
         repository.hints
                 .take(3)
                 .timeout(8, TimeUnit.SECONDS)
+                .doOnNext { hints.clear(); hints.addAll(it) }
                 .onErrorReturn { listOf() }
-                .blockingSubscribe { hints.clear(); hints += it }
+                .blockingSubscribe()
     }
 
     override fun hasStableIds(): Boolean = false
