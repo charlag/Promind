@@ -1,5 +1,6 @@
 package com.charlag.promind.core
 
+import android.graphics.Bitmap
 import com.charlag.promind.core.data.models.Action
 
 /**
@@ -8,4 +9,4 @@ import com.charlag.promind.core.data.models.Action
  * Value which is used to present user hints.
  */
 
-data class UserHint(val id: Long, val title: String?, val action: Action)
+data class UserHint(val id: Long, val title: String?, val icon: Bitmap?, val action: Action)

@@ -26,9 +26,7 @@ class ModelImpl(private val repository: ConditionDAO,
         return repository.getConditions(time, context.date)
                 .filterByConditions(context)
                 .map { conditions ->
-                    val statsHints = statsSource.getPackagesUsed()
-                            .map { UserHint(-1, null, Action.OpenMainAction(it)) }
-                    conditions.map { it.hint } + statsHints
+                    conditions.map { it.hint } + statsSource.getPackagesUsed()
                 }
     }
 

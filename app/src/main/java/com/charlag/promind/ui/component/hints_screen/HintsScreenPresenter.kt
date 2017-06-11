@@ -1,22 +1,12 @@
 package com.charlag.promind.ui.component.hints_screen
 
 import android.Manifest
-import com.charlag.promind.core.action.ActionHandler
-import com.charlag.promind.core.app_data.AppDataProvider
-import com.charlag.promind.core.AssistantContext
-import com.charlag.promind.core.Model
 import com.charlag.promind.core.UserHint
-import com.charlag.promind.core.context_data.DateProvider
-import com.charlag.promind.core.context_data.LocationProvider
+import com.charlag.promind.core.action.ActionHandler
 import com.charlag.promind.core.data.models.Action
-import com.charlag.promind.core.data.models.Location
 import com.charlag.promind.core.repository.HintsRepository
 import com.charlag.promind.util.Empty
 import com.charlag.promind.util.rx.addTo
-import com.charlag.promind.util.rx.onErrorComplete
-import com.stepango.koptional.Optional
-import com.stepango.koptional.orNull
-import com.stepango.koptional.toOptional
 import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.functions.BiFunction
@@ -31,7 +21,6 @@ import java.util.concurrent.TimeUnit
  */
 
 class HintsScreenPresenter(private val hintsRepository: HintsRepository,
-                           private val appDataSource: AppDataProvider,
                            actionHandler: ActionHandler)
     : HintsScreenContract.Presenter {
 
@@ -50,11 +39,6 @@ class HintsScreenPresenter(private val hintsRepository: HintsRepository,
     private val disposable = CompositeDisposable()
 
     init {
-//        val location = permissionGrantedInput.filter { hasLocationPermission(it) }
-//                .switchMap { locationProvider.currentLocation() }
-//                .map { it.toOptional() }
-//                .startWith(Optional.empty<Location>())
-
         Observables.combineLatest(usagePermissionGrantedInput.startWith(false),
                 permissionGrantedInput.startWith(listOf<String>()),
                 refreshedInput.startWith(Empty)) { _, _, _ -> Unit }
@@ -89,13 +73,7 @@ class HintsScreenPresenter(private val hintsRepository: HintsRepository,
     override val requestUsagePermission: Observable<Empty> = requestUsagePermissionSubject
 
     private fun hintToViewModel(hint: UserHint): HintViewModel {
-        return when (hint.action) {
-            is Action.OpenMainAction -> {
-                val appData = appDataSource.getAppData(hint.action.packageName)
-                HintViewModel(hint.title ?: appData.name, appData.icon)
-            }
-            is Action.UriAction -> HintViewModel(hint.title ?: "", null)
-        }
+        return HintViewModel(hint.title ?: "", hint.icon)
     }
 
     override fun attachView(v: HintsScreenContract.View) {

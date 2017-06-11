@@ -11,5 +11,5 @@ import dagger.Component
 @WidgetScoped
 @Component(dependencies = arrayOf(AppComponent::class))
 interface HintsWidgetComponent {
-    fun inject(hintsWidgetProvider: HintsWidgetProvider)
+    fun inject(hintsWidgetProvider: HintRemoteViewsFactory)
 }

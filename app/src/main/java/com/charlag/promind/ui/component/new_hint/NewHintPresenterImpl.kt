@@ -52,7 +52,7 @@ class NewHintPresenterImpl(view: NewHintContract.View, context: Context,
                     val minsFrom = from.hours * 60 + from.minutes
                     val minsTo = to.hours * 60 + to.minutes
                     val action = Action.OpenMainAction(apps[selectedApp].packageName)
-                    val hint = UserHint(-1, title, action)
+                    val hint = UserHint(-1, title, null, action)
                     val condition = Condition(minsFrom, minsTo, null, null, 10000, false, hint)
                     repository.addCondition(condition)
                 }

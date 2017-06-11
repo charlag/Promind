@@ -4,17 +4,10 @@ import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider
 import android.content.Context
-import android.graphics.Bitmap
-import android.graphics.Canvas
-import android.graphics.drawable.BitmapDrawable
-import android.graphics.drawable.Drawable
+import android.content.Intent
+import android.net.Uri
 import android.widget.RemoteViews
 import com.charlag.promind.R
-import com.charlag.promind.app.App
-import com.charlag.promind.core.app_data.AppDataProvider
-import com.charlag.promind.core.repository.HintsRepository
-import com.charlag.promind.util.makeIntent
-import javax.inject.Inject
 
 /**
  * Created by charlag on 15/02/2017.
@@ -22,48 +15,22 @@ import javax.inject.Inject
 
 class HintsWidgetProvider : AppWidgetProvider() {
 
-    @Inject lateinit var repository: HintsRepository
-
     override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager,
                           appWidgetIds: IntArray) {
-        super.onUpdate(context, appWidgetManager, appWidgetIds)
-
-        DaggerHintsWidgetComponent.builder()
-                .appComponent(App.graph)
-                .build()
-                .inject(this)
 
         appWidgetIds.forEach { id ->
+            val intent = Intent(context, WidgetService::class.java)
+            intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, id)
+            intent.data = Uri.parse(intent.toUri(Intent.URI_INTENT_SCHEME))
+
             val views = RemoteViews(context.packageName, R.layout.hints_widget_layout)
-
-            val result = goAsync()
-            repository.hints.take(2)
-                    .doOnTerminate { result.finish() }
-                    .subscribe { hints ->
-                        hints.map { hint ->
-                            val hintView = RemoteViews(context.packageName,
-                                    R.layout.hint_widget)
-                            hintView.setTextViewText(R.id.widget_hint_text, hint.title)
-                            val intent = hint.action.makeIntent(context)
-                            val pendingIntent = PendingIntent.getActivity(context, 0,
-                                    intent, 0)
-                            hintView.setOnClickPendingIntent(R.id.widget_hint_text,
-                                    pendingIntent)
-                            hintView
-                        }.forEach { views.addView(R.id.containter_hints_widget, it) }
-                        appWidgetManager.updateAppWidget(id, views)
-                    }
-
+            views.setRemoteAdapter(R.id.containter_hints_widget, intent)
+            views.setEmptyView(R.id.containter_hints_widget, R.id.empty_view)
+            views.setPendingIntentTemplate(R.id.containter_hints_widget,
+                    PendingIntent.getService(context, 0,
+                            Intent(context, ActionService::class.java), 0))
+            appWidgetManager.updateAppWidget(id, views)
         }
-    }
-
-    private fun drawableToBitmap(drawable: Drawable): Bitmap? {
-        if (drawable is BitmapDrawable) return drawable.bitmap
-        val bitmap = Bitmap.createBitmap(drawable.intrinsicWidth, drawable.intrinsicHeight,
-                Bitmap.Config.ARGB_8888)
-        val canvas = Canvas(bitmap)
-        drawable.setBounds(0, 0, canvas.width, canvas.height)
-        drawable.draw(canvas)
-        return bitmap
+        super.onUpdate(context, appWidgetManager, appWidgetIds)
     }
 }

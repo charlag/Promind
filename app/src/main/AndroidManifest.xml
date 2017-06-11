@@ -37,6 +37,11 @@
 
         <activity android:name="com.charlag.promind.ui.component.new_hint.NewHintActivity">
         </activity>
+
+        <service android:name=".ui.component.widget.WidgetService"
+            android:permission="android.permission.BIND_REMOTEVIEWS"/>
+
+        <service android:name=".ui.component.widget.ActionService"/>
     </application>
 
 </manifest>

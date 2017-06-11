@@ -5,5 +5,5 @@ package com.charlag.promind.core
  */
 
 interface UsageStatsSource {
-    fun getPackagesUsed(): List<String>
+    fun getPackagesUsed(): List<UserHint>
 }

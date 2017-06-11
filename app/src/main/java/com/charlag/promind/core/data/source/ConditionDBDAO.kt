@@ -62,7 +62,7 @@ class ConditionDBDAO(private val dbHelper: ConditionDbHelper) : ConditionDAO {
                                         val timeTo = map[ConditionEntry.timeTo] as Long?
                                         val rawDate = map[ConditionEntry.date] as Long?
 
-                                        val hint = UserHint(hintId, hintTitle, action)
+                                        val hint = UserHint(hintId, hintTitle, null, action)
                                         val location = if (latitude != null && longitude != null)
                                             Location(latitude, longitude)
                                         else null

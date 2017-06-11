@@ -2,7 +2,6 @@ package com.charlag.promind.app
 
 import android.app.Application
 import com.charlag.promind.core.ModelModule
-import com.charlag.promind.core.app_data.AppDataProviderModule
 import com.charlag.promind.core.context_data.ContextDataModule
 import com.charlag.promind.core.data.source.ConditionDAOModule
 import com.charlag.promind.core.repository.HintsRepositoryModule
@@ -25,7 +24,6 @@ class App : Application() {
                 .conditionDAOModule(ConditionDAOModule())
                 .contextDataModule(ContextDataModule())
                 .modelModule(ModelModule())
-                .appDataProviderModule(AppDataProviderModule())
                 .hintsRepositoryModule(HintsRepositoryModule())
                 .build()
     }

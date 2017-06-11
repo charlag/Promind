@@ -130,7 +130,7 @@ class MainActivity : AppCompatActivity(), HintsScreenContract.View {
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
             val vm = items[position]
             holder.title.text = vm.title
-            holder.image.setImageDrawable(vm.icon)
+            holder.image.setImageBitmap(vm.icon)
         }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
