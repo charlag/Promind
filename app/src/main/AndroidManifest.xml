@@ -6,7 +6,7 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     <uses-permission
         android:name="android.permission.PACKAGE_USAGE_STATS"
-        tools:ignore="ProtectedPermissions" />
+        tools:ignore="ProtectedPermissions"/>
     <uses-permission android:name="android.permission.INTERNET"/>
 
     <application
@@ -19,7 +19,6 @@
         <activity android:name=".ui.component.hints_screen.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
-
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
@@ -39,10 +38,18 @@
         <activity android:name="com.charlag.promind.ui.component.new_hint.NewHintActivity">
         </activity>
 
-        <service android:name=".ui.component.widget.WidgetService"
+        <service
+            android:name=".ui.component.widget.WidgetService"
             android:permission="android.permission.BIND_REMOTEVIEWS"/>
 
         <service android:name=".ui.component.widget.ActionService"/>
+
+        <service android:name="com.charlag.promind.submit.SubmitService" android:exported="true"
+                 tools:ignore="ExportedContentProvider">
+            <intent-filter>
+                <action android:name="android.intent.action.ACTION_INSERT"/>
+            </intent-filter>
+        </service>
     </application>
 
 </manifest>

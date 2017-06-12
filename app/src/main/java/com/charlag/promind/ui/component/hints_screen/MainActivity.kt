@@ -2,6 +2,7 @@ package com.charlag.promind.ui.component.hints_screen
 
 import android.Manifest
 import android.app.AppOpsManager
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -21,8 +22,6 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import com.charlag.promind.R
-import com.charlag.promind.app.App
-import com.charlag.promind.ui.component.hints_screen.DaggerHintsComponent
 import com.charlag.promind.ui.component.new_hint.NewHintActivity
 import com.charlag.promind.util.Empty
 import com.charlag.promind.util.appComponent
