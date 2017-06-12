@@ -1,6 +1,5 @@
 package com.charlag.promind.ui.component.widget
 
-import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -8,9 +7,9 @@ import android.os.Looper
 import android.widget.RemoteViews
 import android.widget.RemoteViewsService
 import com.charlag.promind.R
-import com.charlag.promind.app.App
 import com.charlag.promind.core.UserHint
 import com.charlag.promind.core.repository.HintsRepository
+import com.charlag.promind.util.appComponent
 import com.charlag.promind.util.makeIntent
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -21,18 +20,17 @@ import javax.inject.Inject
 
 class WidgetService : RemoteViewsService() {
     override fun onGetViewFactory(intent: Intent): RemoteViewsFactory {
-        return HintRemoteViewsFactory(applicationContext, intent)
+        return HintRemoteViewsFactory(applicationContext)
     }
 }
 
-class HintRemoteViewsFactory(val context: Context,
-                             intent: Intent) : RemoteViewsService.RemoteViewsFactory {
+class HintRemoteViewsFactory(val context: Context) : RemoteViewsService.RemoteViewsFactory {
     @Inject lateinit var repository: HintsRepository
     val hints = mutableListOf<UserHint>()
 
     override fun onCreate() {
         DaggerHintsWidgetComponent.builder()
-                .appComponent(App.graph)
+                .appComponent(context.appComponent)
                 .build().inject(this)
     }
 
@@ -43,7 +41,7 @@ class HintRemoteViewsFactory(val context: Context,
     override fun onDataSetChanged() {
         // kind of a hack to subscribe to location updates
         if (Looper.myLooper() == null) Looper.prepare()
-        // kind of a hack to get data but not wait forever
+        // kind of a hack to get data but to not wait forever
         repository.hints
                 .take(3)
                 .timeout(8, TimeUnit.SECONDS)
@@ -72,6 +70,7 @@ class HintRemoteViewsFactory(val context: Context,
     override fun getCount(): Int = hints.size
 
     override fun onDestroy() {
+        Looper.myLooper().quitSafely()
     }
 
 }

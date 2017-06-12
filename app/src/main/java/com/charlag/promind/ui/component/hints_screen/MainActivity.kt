@@ -25,6 +25,7 @@ import com.charlag.promind.app.App
 import com.charlag.promind.ui.component.hints_screen.DaggerHintsComponent
 import com.charlag.promind.ui.component.new_hint.NewHintActivity
 import com.charlag.promind.util.Empty
+import com.charlag.promind.util.appComponent
 import com.charlag.promind.util.rx.addTo
 import com.charlag.promind.util.view.findView
 import io.reactivex.Observable
@@ -66,7 +67,7 @@ class MainActivity : AppCompatActivity(), HintsScreenContract.View {
         }
 
         DaggerHintsComponent.builder()
-                .appComponent(App.graph)
+                .appComponent(appComponent)
                 .hintsScreenModule(HintsScreenModule())
                 .build()
                 .inject(this)

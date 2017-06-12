@@ -11,6 +11,7 @@ import com.charlag.promind.app.App
 import com.charlag.promind.R
 import com.charlag.promind.ui.component.new_hint.NewHintContract.Time
 import com.charlag.promind.util.Empty
+import com.charlag.promind.util.appComponent
 import com.charlag.promind.util.rx.rxClicks
 import com.charlag.promind.util.rx.rxItemCeleted
 import com.charlag.promind.util.rx.rxText
@@ -51,7 +52,7 @@ class NewHintActivity : AppCompatActivity(), NewHintContract.View {
         addButton = findView(R.id.btn_add)
 
         DaggerNewHintComponent.builder()
-                .appComponent(App.graph)
+                .appComponent(appComponent)
                 .newHintPresenterModule(NewHintPresenterModule(this))
                 .build()
                 .inject(this)

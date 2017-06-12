@@ -50,8 +50,7 @@ class WeatherHintsModule {
 
     @Provides fun converterFactory(): Converter.Factory = MoshiConverterFactory.create()
 
-    @Provides fun weatherHintsProvider(weatherAPI: OpenWeatherAPI,
-                                       @Named("baseUrl") baseUrl: String): WeatherHintsProvider =
-            WeatherHintsProviderImpl(weatherAPI, baseUrl)
+    @Provides fun weatherHintsProvider(weatherAPI: OpenWeatherAPI): WeatherHintsProvider =
+            WeatherHintsProviderImpl(weatherAPI, "https://openweathermap.org/")
 
 }

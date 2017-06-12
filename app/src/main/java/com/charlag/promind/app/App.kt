@@ -14,9 +14,7 @@ import com.charlag.promind.core.stats.UsageStatsModule
 
 class App : Application() {
 
-    companion object {
-        lateinit var graph: AppComponent
-    }
+    lateinit var graph: AppComponent
 
     override fun onCreate() {
         super.onCreate()
