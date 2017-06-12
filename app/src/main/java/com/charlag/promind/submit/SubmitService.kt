@@ -30,6 +30,7 @@ class SubmitService : IntentService("SubmitService") {
         val action = when (data.hint.type) {
             "open_main" -> Action.OpenMainAction(data.hint.data)
             "uri" -> Action.UriAction(data.hint.data)
+            else -> return
         }
         val hint = UserHint(-1, data.hint.title, null, action)
         val location = data.condition.locaiton?.let {
