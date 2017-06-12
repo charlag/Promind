@@ -2,6 +2,7 @@ package com.charlag.promind.app
 
 import android.app.Application
 import com.charlag.promind.core.ModelModule
+import com.charlag.promind.core.apps.AppsSourceModule
 import com.charlag.promind.core.builtin.weather.WeatherHintsModule
 import com.charlag.promind.core.context_data.ContextDataModule
 import com.charlag.promind.core.data.source.ConditionDAOModule
@@ -27,6 +28,7 @@ class App : Application() {
                 .usageStatsModule(UsageStatsModule())
                 .hintsRepositoryModule(HintsRepositoryModule())
                 .weatherHintsModule(WeatherHintsModule())
+                .appsSourceModule(AppsSourceModule())
                 .build()
     }
 }

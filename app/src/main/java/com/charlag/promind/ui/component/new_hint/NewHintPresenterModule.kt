@@ -1,6 +1,7 @@
 package com.charlag.promind.ui.component.new_hint
 
 import android.content.Context
+import com.charlag.promind.core.apps.AppsSource
 import com.charlag.promind.core.data.source.ConditionDAO
 import dagger.Module
 import dagger.Provides
@@ -10,8 +11,8 @@ import dagger.Provides
  */
 
 @Module
-class NewHintPresenterModule(private val view: NewHintContract.View) {
+class NewHintPresenterModule {
     @Provides
-    fun provideNewHintPresenter(context: Context, repository: ConditionDAO): NewHintContract.Presenter
-            = NewHintPresenterImpl(view, context, repository)
+    fun provideNewHintPresenter(dao: ConditionDAO, appsSource: AppsSource): NewHintContract.Presenter
+            = NewHintPresenterImpl(dao, appsSource)
 }

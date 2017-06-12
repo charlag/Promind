@@ -5,6 +5,6 @@ package com.charlag.promind.base
  */
 
 interface Presenter<in View> {
-    fun attachView(v: View)
+    fun attachView(view: View)
     fun detachView()
 }

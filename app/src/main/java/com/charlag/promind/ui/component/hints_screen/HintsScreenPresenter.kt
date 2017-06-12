@@ -76,14 +76,14 @@ class HintsScreenPresenter(private val hintsRepository: HintsRepository,
         return HintViewModel(hint.title ?: "", hint.icon)
     }
 
-    override fun attachView(v: HintsScreenContract.View) {
-        v.permissionsGranted.subscribe(permissionGrantedInput::onNext).addTo(disposable)
-        v.hintSelected.subscribe(hintSelectedInput::onNext).addTo(disposable)
-        v.usagePermissionGranted.subscribe(usagePermissionGrantedInput::onNext).addTo(disposable)
-        v.refreshed.subscribe(refreshedInput::onNext).addTo(disposable)
-        v.requestUsagePermissionClicked.subscribe(usagePermissionClickedInput::onNext).addTo(
+    override fun attachView(view: HintsScreenContract.View) {
+        view.permissionsGranted.subscribe(permissionGrantedInput::onNext).addTo(disposable)
+        view.hintSelected.subscribe(hintSelectedInput::onNext).addTo(disposable)
+        view.usagePermissionGranted.subscribe(usagePermissionGrantedInput::onNext).addTo(disposable)
+        view.refreshed.subscribe(refreshedInput::onNext).addTo(disposable)
+        view.requestUsagePermissionClicked.subscribe(usagePermissionClickedInput::onNext).addTo(
                 disposable)
-        if (!v.isLocationPermissionGranted) requestLocationPermissionSubject.onNext(Empty)
+        if (!view.isLocationPermissionGranted) requestLocationPermissionSubject.onNext(Empty)
     }
 
     override fun detachView() {

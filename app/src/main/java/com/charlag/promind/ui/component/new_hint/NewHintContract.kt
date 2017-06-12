@@ -3,16 +3,18 @@ package com.charlag.promind.ui.component.new_hint
 import com.charlag.promind.util.Empty
 import io.reactivex.Observable
 import io.reactivex.Single
+import java.util.*
 
 /**
  * Created by charlag on 10/04/2017.
  */
 
 class NewHintContract private constructor() {
-    interface Presenter {
-        val appsList: Single<List<AppViewModel>>
+    interface Presenter : com.charlag.promind.base.Presenter<View> {
+        val appsList: Observable<List<AppViewModel>>
         val showFromTimePicker: Observable<Empty>
         val showToTimePicker: Observable<Empty>
+        val showDatePicker: Observable<Empty>
     }
 
     interface View {
@@ -22,7 +24,9 @@ class NewHintContract private constructor() {
         val toTimePressed: Observable<Empty>
         val fromTimePicked: Observable<Time>
         val toTimePicked: Observable<Time>
-        val addPressed: Observable<Any>
+        val datePressed: Observable<Empty>
+        val datePicked: Observable<Date>
+        val addPressed: Observable<Empty>
     }
 
     data class Time(val hours: Int, val minutes: Int)

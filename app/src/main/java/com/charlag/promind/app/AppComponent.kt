@@ -5,6 +5,8 @@ import com.charlag.promind.core.Model
 import com.charlag.promind.core.ModelModule
 import com.charlag.promind.core.action.ActionHandler
 import com.charlag.promind.core.action.ActionHandlerModule
+import com.charlag.promind.core.apps.AppsSource
+import com.charlag.promind.core.apps.AppsSourceModule
 import com.charlag.promind.core.builtin.weather.WeatherHintsModule
 import com.charlag.promind.core.context_data.ContextDataModule
 import com.charlag.promind.core.context_data.DateProvider
@@ -23,7 +25,8 @@ import com.charlag.promind.ui.component.hints_screen.HintsScreenModule
 @javax.inject.Singleton
 @dagger.Component(modules = arrayOf(AppModule::class, ModelModule::class, ConditionDAOModule::class,
         HintsScreenModule::class, ContextDataModule::class, ActionHandlerModule::class,
-        HintsRepositoryModule::class, UsageStatsModule::class, WeatherHintsModule::class))
+        HintsRepositoryModule::class, UsageStatsModule::class, WeatherHintsModule::class,
+        AppsSourceModule::class))
 interface AppComponent {
     fun appContext(): Context
     fun model(): Model
@@ -32,4 +35,5 @@ interface AppComponent {
     fun conditionRespository(): ConditionDAO
     fun actionHandler(): ActionHandler
     fun hintsRepository(): HintsRepository
+    fun appsSource(): AppsSource
 }

@@ -1,6 +1,9 @@
 package com.charlag.promind.core.stats
 
+import android.graphics.Bitmap
+import android.graphics.drawable.Drawable
 import com.charlag.promind.core.data.models.Action
+import com.charlag.promind.util.toBitmap
 
 /**
  * Created by charlag on 15/04/2017.
@@ -60,16 +63,6 @@ class UsageStatsSourceImpl(private val context: android.content.Context) : Usage
                     com.charlag.promind.core.UserHint(-1, name, icon.toBitmap(),
                             Action.OpenMainAction(packageName))
                 }
-    }
-
-    private fun android.graphics.drawable.Drawable.toBitmap(): android.graphics.Bitmap? {
-        if (this is android.graphics.drawable.BitmapDrawable) return this.bitmap
-        val bitmap = android.graphics.Bitmap.createBitmap(this.intrinsicWidth, this.intrinsicHeight,
-                android.graphics.Bitmap.Config.ARGB_8888)
-        val canvas = android.graphics.Canvas(bitmap)
-        this.setBounds(0, 0, canvas.width, canvas.height)
-        this.draw(canvas)
-        return bitmap
     }
 
     private fun filterByTime(event: android.app.usage.UsageEvents.Event, startMinutes: Int,
