@@ -19,11 +19,13 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import com.charlag.promind.R
-import com.charlag.promind.ui.component.new_hint.NewHintActivity
+import com.charlag.promind.ui.frame.FrameModule
+import com.charlag.promind.ui.frame.MainActivity
 import com.charlag.promind.util.Empty
 import com.charlag.promind.util.appComponent
 import com.charlag.promind.util.rx.addTo
 import com.charlag.promind.util.view.findView
+import com.jakewharton.rxbinding2.view.RxView
 import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.subjects.BehaviorSubject
@@ -35,17 +37,20 @@ import javax.inject.Inject
  */
 
 class HintsScreenFragment : Fragment(), HintsScreenContract.View {
-    @Inject lateinit var presenter: HintsScreenContract.Presenter
+    @Inject @JvmField var presenter: HintsScreenContract.Presenter? = null
 
     lateinit var hintsListView: RecyclerView
     lateinit var swipeRefresh: SwipeRefreshLayout
     lateinit var usagePermissionTextView: TextView
+    lateinit var addButton: FloatingActionButton
 
     val adapter = HintsAdapter()
     lateinit var appOpsManager: AppOpsManager
     override val usagePermissionGranted: BehaviorSubject<Boolean> = BehaviorSubject.create()
     override val refreshed: BehaviorSubject<Empty> = BehaviorSubject.create()
     override val requestUsagePermissionClicked: BehaviorSubject<Empty> = BehaviorSubject.create()
+    override val addNewHintPressed: Observable<Empty>
+        get() =  RxView.clicks(addButton).map(Empty.map)
 
     private val disposable = CompositeDisposable()
 
@@ -58,19 +63,18 @@ class HintsScreenFragment : Fragment(), HintsScreenContract.View {
         hintsListView.layoutManager = LinearLayoutManager(context)
         hintsListView.adapter = adapter
 
-        val addButton = view.findViewById(R.id.btn_add) as FloatingActionButton
-        addButton.setOnClickListener {
-            startActivity(Intent(activity, NewHintActivity::class.java))
-        }
-
+        addButton = view.findView(R.id.btn_add)
         appOpsManager = activity.getSystemService(Context.APP_OPS_SERVICE) as AppOpsManager
 
-        DaggerHintsComponent.builder()
-                .appComponent(context.appComponent)
-                .hintsScreenModule(HintsScreenModule())
-                .build()
-                .inject(this)
-
+        if (presenter == null) {
+            DaggerHintsComponent.builder()
+                    .appComponent(context.appComponent)
+                    .hintsScreenModule(HintsScreenModule())
+                    .frameModule(FrameModule(activity as MainActivity))
+                    .build()
+                    .inject(this)
+        }
+        val presenter = presenter!!
         presenter.attachView(this)
 
         presenter.hints.subscribe { hints ->
@@ -124,7 +128,7 @@ class HintsScreenFragment : Fragment(), HintsScreenContract.View {
     override fun onDestroy() {
         super.onDestroy()
         disposable.clear()
-        presenter.detachView()
+        presenter?.detachView()
     }
 
     class HintsAdapter : RecyclerView.Adapter<HintsAdapter.ViewHolder>() {

@@ -2,6 +2,7 @@ package com.charlag.promind.ui.component.new_hint
 
 import com.charlag.promind.app.AppComponent
 import com.charlag.promind.annotation.ActivityScoped
+import com.charlag.promind.ui.frame.FrameModule
 import dagger.Component
 
 /**
@@ -10,7 +11,7 @@ import dagger.Component
 
 @ActivityScoped
 @Component(dependencies = arrayOf(AppComponent::class),
-        modules = arrayOf(NewHintPresenterModule::class))
+        modules = arrayOf(NewHintPresenterModule::class, FrameModule::class))
 interface NewHintComponent {
-    fun inject(activity: NewHintActivity)
+    fun inject(activity: NewHintFragment)
 }

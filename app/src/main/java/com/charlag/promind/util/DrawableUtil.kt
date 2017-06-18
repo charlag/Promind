@@ -13,7 +13,7 @@ fun Drawable.toBitmap(): Bitmap? {
     val bitmap = android.graphics.Bitmap.createBitmap(this.intrinsicWidth, this.intrinsicHeight,
             android.graphics.Bitmap.Config.ARGB_8888)
     val canvas = android.graphics.Canvas(bitmap)
-    this.setBounds(0, 0, canvas.width, canvas.height)
+    this.setBounds(0, 0, minOf(canvas.width, 500), minOf(canvas.height, 500))
     this.draw(canvas)
     return bitmap
 }

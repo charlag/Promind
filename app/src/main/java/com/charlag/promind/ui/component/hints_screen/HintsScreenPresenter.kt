@@ -5,6 +5,7 @@ import com.charlag.promind.core.action.ActionHandler
 import com.charlag.promind.core.data.models.Action
 import com.charlag.promind.core.data.models.UserHint
 import com.charlag.promind.core.repository.HintsRepository
+import com.charlag.promind.ui.frame.Navigator
 import com.charlag.promind.util.Empty
 import com.charlag.promind.util.rx.addTo
 import io.reactivex.Observable
@@ -21,7 +22,7 @@ import java.util.concurrent.TimeUnit
  */
 
 class HintsScreenPresenter(private val hintsRepository: HintsRepository,
-                           actionHandler: ActionHandler)
+                           actionHandler: ActionHandler, navigator: Navigator)
     : HintsScreenContract.Presenter {
 
     private val permissionGrantedInput: PublishSubject<List<String>> = PublishSubject.create()
@@ -29,6 +30,7 @@ class HintsScreenPresenter(private val hintsRepository: HintsRepository,
     private val usagePermissionGrantedInput: PublishSubject<Boolean> = PublishSubject.create()
     private val refreshedInput: PublishSubject<Empty> = PublishSubject.create()
     private val usagePermissionClickedInput: PublishSubject<Empty> = PublishSubject.create()
+    private val newHintInput: PublishSubject<Empty> = PublishSubject.create()
 
     private val hintsSubject: BehaviorSubject<List<UserHint>> = BehaviorSubject.create()
     private val requestLocationPermissionSubject: PublishSubject<Empty> = PublishSubject.create()
@@ -40,7 +42,7 @@ class HintsScreenPresenter(private val hintsRepository: HintsRepository,
     override val showUsagePermissionInfo: BehaviorSubject<Boolean> = BehaviorSubject.create()
 
     init {
-        Observables.combineLatest(usagePermissionGrantedInput.startWith(false),
+        Observables.combineLatest(usagePermissionGrantedInput.distinctUntilChanged().startWith(false),
                 permissionGrantedInput.startWith(listOf<String>()),
                 refreshedInput.startWith(Empty)) { _, _, _ -> Unit }
                 .throttleFirst(800, TimeUnit.MILLISECONDS)
@@ -64,6 +66,8 @@ class HintsScreenPresenter(private val hintsRepository: HintsRepository,
         usagePermissionClickedInput.subscribe {
             requestUsagePermissionSubject.onNext(Empty)
         }.addTo(disposable)
+
+        newHintInput.subscribe { navigator.openNewHint() }.addTo(disposable)
     }
 
     override val hints: Observable<List<HintViewModel>> = hintsSubject.map { hints ->
@@ -81,16 +85,11 @@ class HintsScreenPresenter(private val hintsRepository: HintsRepository,
         view.refreshed.subscribe(refreshedInput::onNext).addTo(disposable)
         view.requestUsagePermissionClicked.subscribe(usagePermissionClickedInput::onNext).addTo(
                 disposable)
+        view.addNewHintPressed.subscribe(newHintInput::onNext).addTo(disposable)
         if (!view.isLocationPermissionGranted) requestLocationPermissionSubject.onNext(Empty)
     }
 
     override fun detachView() {
         disposable.dispose()
     }
-
-    private fun hasLocationPermission(permissions: List<String>): Boolean = permissions.any {
-        it == Manifest.permission.ACCESS_FINE_LOCATION
-                || it == Manifest.permission.ACCESS_COARSE_LOCATION
-    }
-
 }

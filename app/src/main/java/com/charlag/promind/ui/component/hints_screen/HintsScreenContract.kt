@@ -22,5 +22,6 @@ object HintsScreenContract {
         val usagePermissionGranted: Observable<Boolean>
         val refreshed: Observable<Empty>
         val requestUsagePermissionClicked: Observable<Empty>
+        val addNewHintPressed: Observable<Empty>
     }
 }

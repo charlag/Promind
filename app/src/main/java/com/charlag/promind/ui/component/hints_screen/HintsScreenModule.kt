@@ -2,6 +2,7 @@ package com.charlag.promind.ui.component.hints_screen
 
 import com.charlag.promind.core.action.ActionHandler
 import com.charlag.promind.core.repository.HintsRepository
+import com.charlag.promind.ui.frame.Navigator
 import dagger.Module
 import dagger.Provides
 
@@ -12,6 +13,7 @@ import dagger.Provides
 @Module
 class HintsScreenModule {
     @Provides fun providesViewModel(hintsRepository: HintsRepository,
-                                    actionHandler: ActionHandler): HintsScreenContract.Presenter =
-            HintsScreenPresenter(hintsRepository, actionHandler)
+                                    actionHandler: ActionHandler, navigator: Navigator):
+            HintsScreenContract.Presenter
+            = HintsScreenPresenter(hintsRepository, actionHandler, navigator)
 }

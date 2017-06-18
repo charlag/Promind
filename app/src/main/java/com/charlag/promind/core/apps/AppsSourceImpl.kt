@@ -13,6 +13,7 @@ internal class AppsSourceImpl(context: Context) : AppsSource {
 
     override fun listAllApps(): List<AppsSource.AppData> =
             packageManager.getInstalledApplications(PackageManager.GET_META_DATA)
+                    .filter { !it.packageName.startsWith("com.android") }
                     .fold(listOf()) { l, app ->
                         val title = packageManager.getApplicationLabel(app)?.toString() ?:
                                 return@fold l

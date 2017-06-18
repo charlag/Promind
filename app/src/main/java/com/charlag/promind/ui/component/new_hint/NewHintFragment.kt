@@ -2,14 +2,18 @@ package com.charlag.promind.ui.component.new_hint
 
 import android.app.DatePickerDialog
 import android.app.Dialog
-import android.app.DialogFragment
 import android.app.TimePickerDialog
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
+import android.support.v4.app.DialogFragment
+import android.support.v4.app.Fragment
+import android.support.v7.widget.Toolbar
 import android.text.format.DateFormat
+import android.view.LayoutInflater
+import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
 import android.widget.*
 import com.charlag.promind.R
-import com.charlag.promind.ui.component.new_hint.NewHintContract.Time
 import com.charlag.promind.util.Empty
 import com.charlag.promind.util.appComponent
 import com.charlag.promind.util.rx.addTo
@@ -25,41 +29,56 @@ import io.reactivex.subjects.PublishSubject
 import java.util.*
 import javax.inject.Inject
 
-class NewHintActivity : AppCompatActivity(), NewHintContract.View {
+/**
+ * Created by charlag on 18/06/2017.
+ */
 
-    @Inject lateinit var presenter: NewHintContract.Presenter
+class NewHintFragment : Fragment(), NewHintContract.View {
+    @Inject @JvmField var presenter: NewHintContract.Presenter? = null
 
+    private lateinit var toolbar: Toolbar
     private lateinit var titleField: EditText
     private lateinit var appPicker: Spinner
     private lateinit var timeFromButton: Button
     private lateinit var timeToButton: Button
     private lateinit var dateButton: Button
-    private lateinit var addButton: Button
 
-    private val fromTimePickedSubject: PublishSubject<Time> = PublishSubject.create()
-    private val toTimePickedSubject: PublishSubject<Time> = PublishSubject.create()
+    private val fromTimePickedSubject: PublishSubject<NewHintContract.Time> =
+            PublishSubject.create()
+    private val toTimePickedSubject: PublishSubject<NewHintContract.Time> = PublishSubject.create()
 
     private val disposable = CompositeDisposable()
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_add_condition)
-        titleField = findView(R.id.et_title)
-        appPicker = findView(R.id.picker_app)
-        timeFromButton = findView(R.id.btn_time_from)
-        timeToButton = findView(R.id.btn_time_to)
-        dateButton = findView(R.id.btn_date)
-        addButton = findView(R.id.btn_add)
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
+                              savedInstanceState: Bundle?): View? {
+        val view = inflater.inflate(R.layout.fragment_new_hint, container, false)
+        toolbar = view.findView(R.id.toolbar)
+        titleField = view.findView(R.id.et_title)
+        appPicker = view.findView(R.id.picker_app)
+        timeFromButton = view.findView(R.id.btn_time_from)
+        timeToButton = view.findView(R.id.btn_time_to)
+        dateButton = view.findView(R.id.btn_date)
+        toolbar.inflateMenu(R.menu.new_hint)
+        toolbar.setNavigationIcon(R.drawable.ic_close_black_24dp)
+        toolbar.setNavigationOnClickListener { activity.onBackPressed() }
+        return view
+    }
 
-        DaggerNewHintComponent.builder()
-                .appComponent(appComponent)
-                .newHintPresenterModule(NewHintPresenterModule())
-                .build()
-                .inject(this)
+    override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        if (presenter == null) {
+            DaggerNewHintComponent.builder()
+                    .appComponent(context.appComponent)
+                    .newHintPresenterModule(NewHintPresenterModule())
+                    .build()
+                    .inject(this)
+        }
+        val presenter = presenter!!
 
         presenter.attachView(this)
 
-        val appsAdapter = ArrayAdapter<String>(this, android.R.layout.simple_list_item_1)
+        val appsAdapter = ArrayAdapter<String>(context, android.R.layout.simple_list_item_1)
         appPicker.adapter = appsAdapter
 
         presenter.appsList
@@ -70,7 +89,7 @@ class NewHintActivity : AppCompatActivity(), NewHintContract.View {
                 .addTo(disposable)
 
         presenter.showFromTimePicker.subscribe {
-            TimePickerFragment(fromTimePickedSubject).show(fragmentManager, "timePicker")
+            TimePickerFragment(fromTimePickedSubject).show(childFragmentManager, "timePicker")
         }
                 .addTo(disposable)
 
@@ -89,10 +108,9 @@ class NewHintActivity : AppCompatActivity(), NewHintContract.View {
         get() = titleField.rxText.map(CharSequence::toString)
     override val appSelected: Observable<Int>
         get() = appPicker.rxItemCeleted
-    override val fromTimePicked: Observable<Time> = fromTimePickedSubject
-    override val toTimePicked: Observable<Time> = toTimePickedSubject
-    override val addPressed: Observable<Empty>
-        get() = addButton.rxClicks.map(Empty.map)
+    override val fromTimePicked: Observable<NewHintContract.Time> = fromTimePickedSubject
+    override val toTimePicked: Observable<NewHintContract.Time> = toTimePickedSubject
+    override val addPressed: PublishSubject<Empty> = PublishSubject.create()
     override val fromTimePressed: Observable<Empty>
         get() = timeFromButton.rxClicks.map(Empty.map)
     override val toTimePressed: Observable<Empty>
@@ -104,11 +122,17 @@ class NewHintActivity : AppCompatActivity(), NewHintContract.View {
     override fun onDestroy() {
         super.onDestroy()
         disposable.dispose()
+        presenter?.detachView()
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        addPressed.onNext(Empty)
+        return true
     }
 }
 
-class TimePickerFragment(private val observer: Observer<Time>) :
-        DialogFragment(), TimePickerDialog.OnTimeSetListener {
+class TimePickerFragment(private val observer: Observer<NewHintContract.Time>) :
+        android.support.v4.app.DialogFragment(), TimePickerDialog.OnTimeSetListener {
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val cal = Calendar.getInstance()
@@ -119,7 +143,7 @@ class TimePickerFragment(private val observer: Observer<Time>) :
     }
 
     override fun onTimeSet(view: TimePicker?, hourOfDay: Int, minute: Int) {
-        observer.onNext(Time(hourOfDay, minute))
+        observer.onNext(NewHintContract.Time(hourOfDay, minute))
     }
 
 }

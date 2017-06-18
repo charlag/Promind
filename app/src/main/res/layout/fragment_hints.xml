@@ -12,9 +12,8 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:background="@color/colorPrimary"
         app:title="@string/app_name"
-        app:titleTextColor="@android:color/white"
+        style="@style/AppBarStyle"
         />
 
 
