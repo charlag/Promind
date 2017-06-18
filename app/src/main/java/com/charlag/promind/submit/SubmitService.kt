@@ -2,7 +2,7 @@ package com.charlag.promind.submit
 
 import android.app.IntentService
 import android.content.Intent
-import com.charlag.promind.core.UserHint
+import com.charlag.promind.core.data.models.UserHint
 import com.charlag.promind.core.data.models.Action
 import com.charlag.promind.core.data.models.Condition
 import com.charlag.promind.core.data.models.Location
@@ -19,10 +19,6 @@ class SubmitService : IntentService("SubmitService") {
 
     @Inject lateinit var conditionDao: ConditionDAO
     val moshi = Moshi.Builder().build()
-
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        return super.onStartCommand(intent, flags, startId)
-    }
 
     override fun onHandleIntent(intent: Intent) {
         val dataString = intent.extras.getString("hint_data")
@@ -45,10 +41,8 @@ class SubmitService : IntentService("SubmitService") {
 
     data class SudmittedData(val condition: ConditionData, val hint: HintData)
     data class ConditionData(val time: TimeData?, val date: Long?, val locaiton: LocationData?)
-
     data class LocationData(val lat: Double, val lon: Double, val radius: Long,
                             val inverted: Boolean = false)
-
     data class TimeData(val from: Int, val to: Int)
     data class HintData(val title: String, val type: String, val data: String)
 }

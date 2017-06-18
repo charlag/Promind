@@ -1,4 +1,4 @@
-package com.charlag.promind.base
+package com.charlag.promind.ui.lib.base
 
 /**
  * Created by charlag on 28/05/2017.

@@ -7,7 +7,7 @@ import android.os.Looper
 import android.widget.RemoteViews
 import android.widget.RemoteViewsService
 import com.charlag.promind.R
-import com.charlag.promind.core.UserHint
+import com.charlag.promind.core.data.models.UserHint
 import com.charlag.promind.core.repository.HintsRepository
 import com.charlag.promind.util.appComponent
 import com.charlag.promind.util.makeIntent

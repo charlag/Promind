@@ -2,20 +2,23 @@ package com.charlag.promind.app
 
 import android.content.Context
 import android.location.LocationManager
+import dagger.Module
+import dagger.Provides
+import javax.inject.Singleton
 
 /**
  * Created by charlag on 25/03/2017.
  */
 
-@dagger.Module
+@Module
 class AppModule(private val application: App) {
-    @dagger.Provides
+    @Provides
     // TODO: add qualifier
-    @javax.inject.Singleton
+    @Singleton
     fun providesApplicationContext(): Context = application
 
-    @dagger.Provides
-    @javax.inject.Singleton
+    @Provides
+    @Singleton
     fun providesLocationManager(): LocationManager =
             application.getSystemService(
                     android.content.Context.LOCATION_SERVICE) as LocationManager

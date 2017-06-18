@@ -1,7 +1,6 @@
 package com.charlag.promind.core.stats
 
-import android.graphics.Bitmap
-import android.graphics.drawable.Drawable
+import com.charlag.promind.core.data.models.UserHint
 import com.charlag.promind.core.data.models.Action
 import com.charlag.promind.util.toBitmap
 
@@ -16,7 +15,7 @@ class UsageStatsSourceImpl(private val context: android.content.Context) : Usage
 
     private val filterCalendar = java.util.Calendar.getInstance()
 
-    override fun getPackagesUsed(): List<com.charlag.promind.core.UserHint> {
+    override fun getPackagesUsed(): List<UserHint> {
         val usageStatsManager = context.getSystemService(android.content.Context.USAGE_STATS_SERVICE) as
                 android.app.usage.UsageStatsManager
         val packageManager = context.packageManager
@@ -60,7 +59,7 @@ class UsageStatsSourceImpl(private val context: android.content.Context) : Usage
                                     android.content.pm.PackageManager.GET_META_DATA))
                             .toString()
                     val icon = context.packageManager.getApplicationIcon(packageName)
-                    com.charlag.promind.core.UserHint(-1, name, icon.toBitmap(),
+                    UserHint(-1, name, icon.toBitmap(),
                             Action.OpenMainAction(packageName))
                 }
     }

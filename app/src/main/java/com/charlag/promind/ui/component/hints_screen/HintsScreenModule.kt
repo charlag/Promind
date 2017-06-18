@@ -11,8 +11,7 @@ import dagger.Provides
 
 @Module
 class HintsScreenModule {
-    @Provides
-    fun providesViewModel(hintsRepository: HintsRepository,
-                          actionHandler: ActionHandler): HintsScreenContract.Presenter =
+    @Provides fun providesViewModel(hintsRepository: HintsRepository,
+                                    actionHandler: ActionHandler): HintsScreenContract.Presenter =
             HintsScreenPresenter(hintsRepository, actionHandler)
 }

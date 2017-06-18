@@ -5,8 +5,7 @@ import com.charlag.promind.core.data.source.db.HintContract.*
 /**
  * Created by charlag on 11/02/2017.
  *
- * Abstraction of possible action as a reaction on user selection.
- * Not using Intent for this to be independent from Android.
+ * Abstraction of a possible action as a reaction on user selection.
  */
 
 sealed class Action {

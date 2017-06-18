@@ -7,6 +7,5 @@ import java.util.*
  */
 
 class DateProviderImpl : DateProvider {
-    override val date: Date
-        get() = Date()
+    override fun currentDate(): Date = Date()
 }

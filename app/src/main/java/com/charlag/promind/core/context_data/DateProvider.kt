@@ -6,5 +6,5 @@ import java.util.*
  * Created by charlag on 27/03/2017.
  */
 interface DateProvider {
-    val date: Date
+    fun currentDate(): Date
 }

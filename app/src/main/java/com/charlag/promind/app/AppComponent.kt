@@ -1,8 +1,8 @@
 package com.charlag.promind.app
 
 import android.content.Context
-import com.charlag.promind.core.Model
-import com.charlag.promind.core.ModelModule
+import com.charlag.promind.core.model.Model
+import com.charlag.promind.core.model.ModelModule
 import com.charlag.promind.core.action.ActionHandler
 import com.charlag.promind.core.action.ActionHandlerModule
 import com.charlag.promind.core.apps.AppsSource
@@ -16,15 +16,16 @@ import com.charlag.promind.core.data.source.ConditionDAOModule
 import com.charlag.promind.core.repository.HintsRepository
 import com.charlag.promind.core.repository.HintsRepositoryModule
 import com.charlag.promind.core.stats.UsageStatsModule
-import com.charlag.promind.ui.component.hints_screen.HintsScreenModule
+import dagger.Component
+import javax.inject.Singleton
 
 /**
  * Created by charlag on 25/03/2017.
  */
 
-@javax.inject.Singleton
-@dagger.Component(modules = arrayOf(AppModule::class, ModelModule::class, ConditionDAOModule::class,
-        HintsScreenModule::class, ContextDataModule::class, ActionHandlerModule::class,
+@Singleton
+@Component(modules = arrayOf(AppModule::class, ModelModule::class, ConditionDAOModule::class,
+        ContextDataModule::class, ActionHandlerModule::class,
         HintsRepositoryModule::class, UsageStatsModule::class, WeatherHintsModule::class,
         AppsSourceModule::class))
 interface AppComponent {

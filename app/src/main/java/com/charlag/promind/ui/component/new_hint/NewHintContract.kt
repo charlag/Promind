@@ -2,15 +2,14 @@ package com.charlag.promind.ui.component.new_hint
 
 import com.charlag.promind.util.Empty
 import io.reactivex.Observable
-import io.reactivex.Single
 import java.util.*
 
 /**
  * Created by charlag on 10/04/2017.
  */
 
-class NewHintContract private constructor() {
-    interface Presenter : com.charlag.promind.base.Presenter<View> {
+object NewHintContract {
+    interface Presenter : com.charlag.promind.ui.lib.base.Presenter<View> {
         val appsList: Observable<List<AppViewModel>>
         val showFromTimePicker: Observable<Empty>
         val showToTimePicker: Observable<Empty>

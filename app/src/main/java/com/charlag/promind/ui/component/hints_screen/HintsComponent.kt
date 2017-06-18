@@ -11,5 +11,5 @@ import dagger.Component
 @ActivityScoped
 @Component(dependencies = arrayOf(AppComponent::class), modules = arrayOf(HintsScreenModule::class))
 interface HintsComponent {
-    fun inject(screen: MainActivity)
+    fun inject(screen: HintsScreenFragment)
 }

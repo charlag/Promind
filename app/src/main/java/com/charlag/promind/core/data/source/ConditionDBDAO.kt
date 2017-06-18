@@ -1,7 +1,7 @@
 package com.charlag.promind.core.data.source
 
 import android.content.ContentValues
-import com.charlag.promind.core.UserHint
+import com.charlag.promind.core.data.models.UserHint
 import com.charlag.promind.core.data.models.Action
 import com.charlag.promind.core.data.models.Condition
 import com.charlag.promind.core.data.models.Location

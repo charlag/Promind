@@ -6,8 +6,8 @@ import io.reactivex.Observable
 /**
  * Created by charlag on 17/04/2017.
  */
-class HintsScreenContract private constructor() {
-    interface Presenter : com.charlag.promind.base.Presenter<View> {
+object HintsScreenContract {
+    interface Presenter : com.charlag.promind.ui.lib.base.Presenter<View> {
         val hints: Observable<List<HintViewModel>>
         val requestLocationPermission: Observable<Empty>
         val requestUsagePermission: Observable<Empty>

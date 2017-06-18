@@ -1,6 +1,6 @@
 package com.charlag.promind.ui.component.new_hint
 
-import com.charlag.promind.core.UserHint
+import com.charlag.promind.core.data.models.UserHint
 import com.charlag.promind.core.apps.AppsSource
 import com.charlag.promind.core.data.models.Action
 import com.charlag.promind.core.data.models.Condition
@@ -45,7 +45,6 @@ class NewHintPresenterImpl(dao: ConditionDAO, appsSource: AppsSource) :
     }
 
     init {
-
         Single.fromCallable { appsSource.listAllApps() }
                 .subscribeOn(Schedulers.computation())
                 .subscribe(apps::onNext)

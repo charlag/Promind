@@ -1,6 +1,6 @@
 package com.charlag.promind.core.repository
 
-import com.charlag.promind.core.Model
+import com.charlag.promind.core.model.Model
 import com.charlag.promind.core.context_data.DateProvider
 import com.charlag.promind.core.context_data.LocationProvider
 import dagger.Module

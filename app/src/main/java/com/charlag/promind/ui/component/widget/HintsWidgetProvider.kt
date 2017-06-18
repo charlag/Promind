@@ -17,7 +17,6 @@ class HintsWidgetProvider : AppWidgetProvider() {
 
     override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager,
                           appWidgetIds: IntArray) {
-
         appWidgetIds.forEach { id ->
             val intent = Intent(context, WidgetService::class.java)
             intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, id)

@@ -3,8 +3,8 @@ package com.charlag.promind.core.builtin.weather
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.util.Log
-import com.charlag.promind.core.AssistantContext
-import com.charlag.promind.core.UserHint
+import com.charlag.promind.core.data.models.AssistantContext
+import com.charlag.promind.core.data.models.UserHint
 import com.charlag.promind.core.data.models.Action
 import io.reactivex.Maybe
 

@@ -1,21 +1,23 @@
-package com.charlag.promind.core
+package com.charlag.promind.core.model
 
-import com.charlag.promind.core.builtin.weather.WeatherHintsModule
+import com.charlag.promind.core.data.models.AssistantContext
 import com.charlag.promind.core.builtin.weather.WeatherHintsProvider
 import com.charlag.promind.core.data.models.Condition
+import com.charlag.promind.core.data.models.UserHint
 import com.charlag.promind.core.data.source.ConditionDAO
 import com.charlag.promind.core.stats.UsageStatsSource
 import io.reactivex.Observable
+import io.reactivex.rxkotlin.Observables
 import java.util.*
 
 /**
  * Created by charlag on 11/02/2017.
  *
- * Implementation of Model. Uses database to get conditions and checks provides hints for the
+ * Implementation of Model. Uses database to get conditions and checks providers hints for the
  * matching conditions.
  */
 
-class ModelImpl(private val repository: ConditionDAO,
+class ModelImpl(private val conditionDAO: ConditionDAO,
                 private val statsSource: UsageStatsSource,
                 private val weatherHintsProvider: WeatherHintsProvider) : Model {
 
@@ -25,8 +27,7 @@ class ModelImpl(private val repository: ConditionDAO,
             get(Calendar.HOUR_OF_DAY) * 60 + get(Calendar.MINUTE)
         }
 
-
-        return repository.getConditions(time, context.date)
+        return conditionDAO.getConditions(time, context.date)
                 .filterByConditions(context)
                 .map { conditions ->
                     val weatherHints = weatherHintsProvider.weatherHints(

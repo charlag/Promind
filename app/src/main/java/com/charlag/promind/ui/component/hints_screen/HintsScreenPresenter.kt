@@ -1,9 +1,9 @@
 package com.charlag.promind.ui.component.hints_screen
 
 import android.Manifest
-import com.charlag.promind.core.UserHint
 import com.charlag.promind.core.action.ActionHandler
 import com.charlag.promind.core.data.models.Action
+import com.charlag.promind.core.data.models.UserHint
 import com.charlag.promind.core.repository.HintsRepository
 import com.charlag.promind.util.Empty
 import com.charlag.promind.util.rx.addTo
@@ -30,13 +30,14 @@ class HintsScreenPresenter(private val hintsRepository: HintsRepository,
     private val refreshedInput: PublishSubject<Empty> = PublishSubject.create()
     private val usagePermissionClickedInput: PublishSubject<Empty> = PublishSubject.create()
 
-    private val hintsSubject: ReplaySubject<List<UserHint>> = ReplaySubject.createWithSize(1)
+    private val hintsSubject: BehaviorSubject<List<UserHint>> = BehaviorSubject.create()
     private val requestLocationPermissionSubject: PublishSubject<Empty> = PublishSubject.create()
     private val requestUsagePermissionSubject: BehaviorSubject<Empty> = BehaviorSubject.create()
+    private val disposable = CompositeDisposable()
+    override val requestLocationPermission: Observable<Empty> = requestLocationPermissionSubject
+    override val requestUsagePermission: Observable<Empty> = requestUsagePermissionSubject
     override val refreshing: BehaviorSubject<Boolean> = BehaviorSubject.create()
     override val showUsagePermissionInfo: BehaviorSubject<Boolean> = BehaviorSubject.create()
-
-    private val disposable = CompositeDisposable()
 
     init {
         Observables.combineLatest(usagePermissionGrantedInput.startWith(false),
@@ -68,9 +69,6 @@ class HintsScreenPresenter(private val hintsRepository: HintsRepository,
     override val hints: Observable<List<HintViewModel>> = hintsSubject.map { hints ->
         hints.map(this::hintToViewModel)
     }
-
-    override val requestLocationPermission: Observable<Empty> = requestLocationPermissionSubject
-    override val requestUsagePermission: Observable<Empty> = requestUsagePermissionSubject
 
     private fun hintToViewModel(hint: UserHint): HintViewModel {
         return HintViewModel(hint.title ?: "", hint.icon)

@@ -7,4 +7,4 @@ import javax.inject.Scope
  */
 
 @Scope
-annotation class WidgetScoped
+annotation class ServiceScoped
